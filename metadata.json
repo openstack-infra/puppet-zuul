@@ -1,0 +1,13 @@
+{
+  "name": "openstackci-zuul",
+  "version": "0.0.1",
+  "author": "Openstack CI",
+  "summary": "Puppet module for Zuul",
+  "license": "Apache 2.0",
+  "source": "git://git.openstack.org/openstack-infra/puppet-zuul.git",
+  "project_page": "http://ci.openstack.org/",
+  "issues_url": "https://storyboard.openstack.org/#!/project/740",
+  "dependencies": [
+    {"name":"openstackci/vcsrepo","version_requirement":">= 0.0.8"}
+  ]
+}
