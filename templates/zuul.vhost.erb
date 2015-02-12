@@ -7,6 +7,19 @@
     Allow from all
     Satisfy Any
   </Directory>
+#  <Directory /var/lib/zuul/git>
+#    AllowOverride none
+#    Order allow,deny
+#    Allow from all
+#    Require all granted
+#  </Directory>
+  <Directory /usr/lib/git-core>
+    Options +ExecCgi -MultiViews +SymLinksIfOwnerMatch
+#    AllowOverride none
+#    Order allow,deny
+#    Allow from all
+    Require all granted
+  </Directory>
 
   ErrorLog ${APACHE_LOG_DIR}/<%= scope.lookupvar("::zuul::vhost_name") %>-error.log
 

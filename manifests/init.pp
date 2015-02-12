@@ -347,6 +347,11 @@ class zuul (
       ensure => present,
     }
   }
+  if ! defined(A2mod['cgi']) {
+    a2mod { 'cgi':
+      ensure => present,
+    }
+  }
 
   case $::lsbdistcodename {
     'precise': {
