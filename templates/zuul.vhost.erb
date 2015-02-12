@@ -7,6 +7,10 @@
     Allow from all
     Satisfy Any
   </Directory>
+  <Directory /usr/lib/git-core>
+    Options +ExecCgi
+    Require all granted
+  </Directory>
 
   ErrorLog ${APACHE_LOG_DIR}/<%= scope.lookupvar("::zuul::vhost_name") %>-error.log
 
