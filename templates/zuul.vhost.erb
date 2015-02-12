@@ -1,6 +1,6 @@
 <VirtualHost *:80>
-  ServerName <%= scope.lookupvar("::zuul::vhost_name") %>
-  ServerAdmin <%= scope.lookupvar("::zuul::serveradmin") %>
+  ServerName <%= @vhost_name %>
+  ServerAdmin <%= @serveradmin %>
   DocumentRoot /var/lib/zuul/www
 
   <Directory /var/lib/zuul/www>
@@ -8,11 +8,11 @@
     Satisfy Any
   </Directory>
 
-  ErrorLog ${APACHE_LOG_DIR}/<%= scope.lookupvar("::zuul::vhost_name") %>-error.log
+  ErrorLog ${APACHE_LOG_DIR}/<%= @vhost_name %>-error.log
 
   LogLevel warn
 
-  CustomLog ${APACHE_LOG_DIR}/<%= scope.lookupvar("::zuul::vhost_name") %>-access.log combined
+  CustomLog ${APACHE_LOG_DIR}/<%= @vhost_name %>-access.log combined
 
   RewriteEngine on
   RewriteRule ^/status.json$ http://127.0.0.1:8001/status.json [P]
@@ -43,5 +43,62 @@
       CacheRoot /var/cache/apache2/mod_cache_disk
     </IfModule>
   </IfModule>
-
 </VirtualHost>
+
+<% if @proxy_ssl_cert_file_contents != '' %>
+<IfModule mod_ssl.c>
+<VirtualHost *:443>
+  ServerName <%= @vhost_name %>
+  ServerAdmin <%= @serveradmin %>
+  DocumentRoot /var/lib/zuul/www
+  SSLEngine on
+  SSLProtocol All -SSLv2 -SSLv3
+  SSLCertificateFile /etc/ssl/certs/<%= @vhost_name %>.pem
+  SSLCertificateKeyFile /etc/ssl/private/<%= @vhost_name %>.key
+<% if @proxy_ssl_chain_file_contents != '' %>
+  SSLCertificateChainFile /etc/ssl/certs/<%= @vhost_name %>_intermediate.pem
+<% end %>
+
+  <Directory /var/lib/zuul/www>
+    Allow from all
+    Satisfy Any
+  </Directory>
+
+  ErrorLog ${APACHE_LOG_DIR}/<%= @vhost_name %>-error.log
+
+  LogLevel warn
+
+  CustomLog ${APACHE_LOG_DIR}/<%= @vhost_name %>-access.log combined
+
+  RewriteEngine on
+  RewriteRule ^/status.json$ http://127.0.0.1:8001/status.json [P]
+
+  AddOutputFilterByType DEFLATE application/json
+
+  SetEnv GIT_PROJECT_ROOT /var/lib/zuul/git/
+  SetEnv GIT_HTTP_EXPORT_ALL
+
+  AliasMatch ^/p/(.*/objects/[0-9a-f]{2}/[0-9a-f]{38})$ /var/lib/zuul/git/$1
+  AliasMatch ^/p/(.*/objects/pack/pack-[0-9a-f]{40}.(pack|idx))$ /var/lib/zuul/git/$1
+  ScriptAlias /p/ /usr/lib/git-core/git-http-backend/
+
+  <IfModule mod_cache.c>
+    CacheDefaultExpire 5
+    <IfModule mod_mem_cache.c>
+      CacheEnable mem /status.json
+      # 12MByte total cache size.
+      MCacheSize 12288
+      MCacheMaxObjectCount 10
+      MCacheMinObjectSize 1
+      # 8MByte max size per cache entry
+      MCacheMaxObjectSize 8388608
+      MCacheMaxStreamingBuffer 8388608
+    </IfModule>
+    <IfModule mod_cache_disk.c>
+      CacheEnable disk /status.json
+      CacheRoot /var/cache/apache2/mod_cache_disk
+    </IfModule>
+  </IfModule>
+</VirtualHost>
+</IfModule>
+<% end %>
