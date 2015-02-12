@@ -47,6 +47,9 @@ class zuul (
   $swift_region_name = '',
   $swift_default_container = '',
   $swift_default_logserver_prefix = '',
+  $proxy_ssl_cert_file_contents = '',
+  $proxy_ssl_key_file_contents = '',
+  $proxy_ssl_chain_file_contents = '',
 ) {
   include apache
   include pip
@@ -321,10 +324,58 @@ class zuul (
     source => 'puppet:///modules/zuul/zuul-merger.init',
   }
 
+  if $proxy_ssl_cert_file_contents == '' {
+    $ssl = false
+  } else {
+    $ssl = true
+    file { '/etc/ssl/certs':
+      ensure => directory,
+      owner  => 'root',
+      group  => 'root',
+      mode   => '0755',
+    }
+    file { '/etc/ssl/private':
+      ensure => directory,
+      owner  => 'root',
+      group  => 'root',
+      mode   => '0700',
+    }
+    file { "/etc/ssl/certs/${vhost_name}.pem":
+      ensure  => present,
+      owner   => 'root',
+      group   => 'root',
+      mode    => '0644',
+      content => $proxy_ssl_cert_file_contents,
+      require => File['/etc/ssl/certs'],
+      before  => Apache::Vhost[$vhost_name],
+    }
+    file { "/etc/ssl/private/${vhost_name}.key":
+      ensure  => present,
+      owner   => 'root',
+      group   => 'root',
+      mode    => '0600',
+      content => $proxy_ssl_key_file_contents,
+      require => File['/etc/ssl/private'],
+      before  => Apache::Vhost[$vhost_name],
+    }
+    if $proxy_ssl_chain_file_contents != '' {
+      file { "/etc/ssl/certs/${vhost_name}_intermediate.pem":
+        ensure  => present,
+        owner   => 'root',
+        group   => 'root',
+        mode    => '0644',
+        content => $proxy_ssl_cert_file_contents,
+        require => File['/etc/ssl/certs'],
+        before  => Apache::Vhost[$vhost_name],
+      }
+    }
+  }
+
   apache::vhost { $vhost_name:
-    port     => 443,
+    port     => 0, # conditional overrides in vhost config
     docroot  => 'MEANINGLESS ARGUMENT',
     priority => '50',
+    ssl      => $ssl,
     template => 'zuul/zuul.vhost.erb',
   }
   if ! defined(A2mod['rewrite']) {
