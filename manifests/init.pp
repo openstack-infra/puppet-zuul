@@ -47,9 +47,16 @@ class zuul (
   $swift_region_name = '',
   $swift_default_container = '',
   $swift_default_logserver_prefix = '',
+  $manage_pip = false,
 ) {
   include apache
-  include pip
+
+  if $manage_pip == true {
+    package { 'pip':
+      ensure => latest,
+      before => [Package['yappi'], Exec['install_zuul']],
+    }
+  }
 
   $packages = [
     'gcc',  # yappi requires this to build
@@ -65,7 +72,6 @@ class zuul (
   package { 'yappi':
     ensure   => present,
     provider => pip,
-    require  => Class['pip'],
   }
 
   # needed by python-keystoneclient, has system bindings
@@ -128,7 +134,6 @@ class zuul (
     refreshonly => true,
     subscribe   => Vcsrepo['/opt/zuul'],
     require     => [
-      Class['pip'],
       Package['gcc'],
       Package['python-daemon'],
       Package['python-lockfile'],
