@@ -53,7 +53,6 @@ class zuul (
 
   $packages = [
     'gcc',  # yappi requires this to build
-    'python-lockfile',
     'python-paste',
     'python-webob',
   ]
@@ -131,7 +130,6 @@ class zuul (
       Class['pip'],
       Package['gcc'],
       Package['python-daemon'],
-      Package['python-lockfile'],
       Package['python-lxml'],
       Package['python-paramiko'],
       Package['python-paste'],
