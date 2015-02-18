@@ -47,6 +47,7 @@ class zuul (
   $swift_region_name = '',
   $swift_default_container = '',
   $swift_default_logserver_prefix = '',
+  $swift_default_expiry = 7200,
 ) {
   include apache
   include pip
