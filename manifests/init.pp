@@ -84,9 +84,11 @@ class zuul (
     }
   }
 
-  if ! defined(Package['python-paramiko']) {
-    package { 'python-paramiko':
+  if ! defined(Package['paramiko']) {
+    package { 'paramiko':
       ensure   => present,
+      provider => pip,
+      require  => Class['pip'],
     }
   }
 
@@ -130,9 +132,9 @@ class zuul (
     require     => [
       Class['pip'],
       Package['gcc'],
+      Package['paramiko'],
       Package['python-daemon'],
       Package['python-lxml'],
-      Package['python-paramiko'],
       Package['python-paste'],
       Package['python-webob'],
       Package['python-yaml'],
