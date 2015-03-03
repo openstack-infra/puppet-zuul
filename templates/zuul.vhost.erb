@@ -1,4 +1,4 @@
-<VirtualHost *:80>
+<VirtualHost <%= scope.lookupvar("::zuul::vhost_name") %>:80>
   ServerName <%= scope.lookupvar("::zuul::vhost_name") %>
   ServerAdmin <%= scope.lookupvar("::zuul::serveradmin") %>
   DocumentRoot /var/lib/zuul/www
