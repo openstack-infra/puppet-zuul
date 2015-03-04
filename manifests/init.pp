@@ -123,7 +123,7 @@ class zuul (
   }
 
   exec { 'install_zuul' :
-    command     => 'pip install /opt/zuul',
+    command     => 'pip install -U /opt/zuul',
     path        => '/usr/local/bin:/usr/bin:/bin/',
     refreshonly => true,
     subscribe   => Vcsrepo['/opt/zuul'],
