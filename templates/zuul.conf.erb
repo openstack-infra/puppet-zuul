@@ -11,6 +11,8 @@ user=<%= @gerrit_user %>
 sshkey=/var/lib/zuul/ssh/id_rsa
 <% if @gerrit_baseurl != "" -%>
 baseurl=<%= @gerrit_baseurl %>
+<% if @fetch_url != "" -%>
+fetch_url=<%= fetch_url %>
 <% end -%>
 
 [zuul]
@@ -31,6 +33,9 @@ git_user_email=<%= @git_email %>
 <% if @git_name != "" -%>
 git_user_name=<%= @git_name %>
 <% end -%>
+poll=<%= @merger_poll %>
+poll_interval=<%= @merger_poll_interval %>
+poll_timeout=<%= @merger_poll_timeout %>
 
 <% if @swift_authurl != "" -%>
 [swift]
