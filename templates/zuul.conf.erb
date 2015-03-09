@@ -9,6 +9,9 @@ log_config=/etc/zuul/gearman-logging.conf
 server=<%= gerrit_server %>
 user=<%= gerrit_user %>
 sshkey=/var/lib/zuul/ssh/id_rsa
+<% if @fetch_url != "" -%>
+fetch_url=<%= fetch_url %>
+<% end -%>
 <% if gerrit_baseurl != "" -%>
 baseurl=<%= gerrit_baseurl %>
 <% end -%>
@@ -30,6 +33,13 @@ git_user_email=<%= git_email %>
 <% end -%>
 <% if git_name != "" -%>
 git_user_name=<%= git_name %>
+<% end -%>
+poll=<%= @merger_poll %>
+<% if @merger_poll_interval -%>
+poll_interval=<%= @merger_poll_interval %>
+<% end -%>
+<% if @merger_poll_timeout -%>
+poll_timeout=<%= @merger_poll_timeout %>
 <% end -%>
 
 <% if swift_authurl != "" -%>
