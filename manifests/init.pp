@@ -48,6 +48,10 @@ class zuul (
   $swift_default_container = '',
   $swift_default_logserver_prefix = '',
   $swift_default_expiry = 7200,
+  $fetch_url = '',
+  $merger_poll = False,
+  $merger_poll_interval = 1,
+  $merger_poll_timeout = 60,
 ) {
   include apache
   include pip
