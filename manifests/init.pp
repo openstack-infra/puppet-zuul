@@ -48,6 +48,7 @@ class zuul (
   $swift_default_container = '',
   $swift_default_logserver_prefix = '',
   $swift_default_expiry = 7200,
+  $fetch_url = '',
 ) {
   include apache
   include pip
