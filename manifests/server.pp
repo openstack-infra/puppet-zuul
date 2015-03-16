@@ -19,34 +19,34 @@ class zuul::server (
   $layout_dir = '',
 ) {
   service { 'zuul':
-    name       => 'zuul',
-    enable     => true,
+    name => 'zuul',
+    enable => true,
     hasrestart => true,
-    require    => File['/etc/init.d/zuul'],
+    require => File['/etc/init.d/zuul'],
   }
 
   exec { 'zuul-reload':
-    command     => '/etc/init.d/zuul reload',
-    require     => File['/etc/init.d/zuul'],
+    command => '/etc/init.d/zuul reload',
+    require => File['/etc/init.d/zuul'],
     refreshonly => true,
   }
 
   file { '/etc/zuul/layout':
-    ensure  => directory,
-    owner   => 'root',
-    group   => 'root',
-    mode    => '0755',
+    ensure => directory,
+    owner => 'root',
+    group => 'root',
+    mode => '0755',
     recurse => true,
-    purge   => true,
-    force   => true,
-    source  => $layout_dir,
+    purge => true,
+    force => true,
+    source => $layout_dir,
     require => File['/etc/zuul'],
-    notify  => Exec['zuul-reload'],
+    notify => Exec['zuul-reload'],
   }
 
   include logrotate
   logrotate::file { 'zuul.log':
-    log     => '/var/log/zuul/zuul.log',
+    log => '/var/log/zuul/zuul.log',
     options => [
       'compress',
       'missingok',
@@ -57,7 +57,7 @@ class zuul::server (
     require => Service['zuul'],
   }
   logrotate::file { 'zuul-debug.log':
-    log     => '/var/log/zuul/debug.log',
+    log => '/var/log/zuul/debug.log',
     options => [
       'compress',
       'missingok',
@@ -68,7 +68,7 @@ class zuul::server (
     require => Service['zuul'],
   }
   logrotate::file { 'gearman-server.log':
-    log     => '/var/log/zuul/gearman-server.log',
+    log => '/var/log/zuul/gearman-server.log',
     options => [
       'compress',
       'missingok',
