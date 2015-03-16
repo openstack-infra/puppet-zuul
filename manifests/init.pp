@@ -371,11 +371,12 @@ class zuul (
   }
 
   apache::vhost { $vhost_name:
-    port     => 443, # Is required despite not being used.
-    docroot  => 'MEANINGLESS ARGUMENT',
-    priority => '50',
-    ssl      => $ssl,
-    template => 'zuul/zuul.vhost.erb',
+    port       => 443, # Is required despite not being used.
+    docroot    => 'MEANINGLESS ARGUMENT',
+    priority   => '50',
+    ssl        => $ssl,
+    template   => 'zuul/zuul.vhost.erb',
+    vhost_name => $vhost_name,
   }
   if ! defined(A2mod['rewrite']) {
     a2mod { 'rewrite':
