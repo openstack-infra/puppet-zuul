@@ -66,9 +66,9 @@ class zuul (
   }
 
   package { 'yappi':
-    ensure => present,
+    ensure   => present,
     provider => pip,
-    require => Class['pip'],
+    require  => Class['pip'],
   }
 
   # needed by python-keystoneclient, has system bindings
@@ -89,7 +89,7 @@ class zuul (
 
   if ! defined(Package['python-paramiko']) {
     package { 'python-paramiko':
-      ensure => present,
+      ensure   => present,
     }
   }
 
@@ -106,12 +106,12 @@ class zuul (
   }
 
   user { 'zuul':
-    ensure => present,
-    home => '/home/zuul',
-    shell => '/bin/bash',
-    gid => 'zuul',
+    ensure     => present,
+    home       => '/home/zuul',
+    shell      => '/bin/bash',
+    gid        => 'zuul',
     managehome => true,
-    require => Group['zuul'],
+    require    => Group['zuul'],
   }
 
   group { 'zuul':
@@ -119,18 +119,18 @@ class zuul (
   }
 
   vcsrepo { '/opt/zuul':
-    ensure => latest,
+    ensure   => latest,
     provider => git,
     revision => $revision,
-    source  => $git_source_repo,
+    source   => $git_source_repo,
   }
 
   exec { 'install_zuul' :
-    command => 'pip install -U /opt/zuul',
-    path => '/usr/local/bin:/usr/bin:/bin/',
+    command     => 'pip install -U /opt/zuul',
+    path        => '/usr/local/bin:/usr/bin:/bin/',
     refreshonly => true,
-    subscribe => Vcsrepo['/opt/zuul'],
-    require => [
+    subscribe   => Vcsrepo['/opt/zuul'],
+    require     => [
       Class['pip'],
       Package['gcc'],
       Package['python-daemon'],
@@ -151,9 +151,9 @@ class zuul (
 # TODO: We should put in  notify either Service['zuul'] or Exec['zuul-reload']
 #       at some point, but that still has some problems.
   file { '/etc/zuul/zuul.conf':
-    ensure => present,
-    owner => 'zuul',
-    mode => '0400',
+    ensure  => present,
+    owner   => 'zuul',
+    mode    => '0400',
     content => template('zuul/zuul.conf.erb'),
     require => [
       File['/etc/zuul'],
@@ -162,61 +162,61 @@ class zuul (
   }
 
   file { '/etc/default/zuul':
-    ensure => present,
-    mode => '0444',
+    ensure  => present,
+    mode    => '0444',
     content => template('zuul/zuul.default.erb'),
   }
 
   file { '/var/log/zuul':
-    ensure => directory,
-    owner => 'zuul',
+    ensure  => directory,
+    owner   => 'zuul',
     require => User['zuul'],
   }
 
   file { '/var/run/zuul':
-    ensure => directory,
-    owner => 'zuul',
-    group => 'zuul',
+    ensure  => directory,
+    owner   => 'zuul',
+    group   => 'zuul',
     require => User['zuul'],
   }
 
   file { '/var/run/zuul-merger':
-    ensure => directory,
-    owner => 'zuul',
-    group => 'zuul',
+    ensure  => directory,
+    owner   => 'zuul',
+    group   => 'zuul',
     require => User['zuul'],
   }
 
   file { '/var/lib/zuul':
-    ensure => directory,
-    owner => 'zuul',
-    group => 'zuul',
+    ensure  => directory,
+    owner   => 'zuul',
+    group   => 'zuul',
   }
 
   file { '/var/lib/zuul/git':
-    ensure => directory,
-    owner => 'zuul',
+    ensure  => directory,
+    owner   => 'zuul',
     require => File['/var/lib/zuul'],
   }
 
   file { '/var/lib/zuul/ssh':
-    ensure => directory,
-    owner => 'zuul',
-    group => 'zuul',
-    mode  => '0500',
+    ensure  => directory,
+    owner   => 'zuul',
+    group   => 'zuul',
+    mode    => '0500',
     require => File['/var/lib/zuul'],
   }
 
   file { '/var/lib/zuul/ssh/id_rsa':
-    owner => 'zuul',
-    group => 'zuul',
-    mode => '0400',
+    owner   => 'zuul',
+    group   => 'zuul',
+    mode    => '0400',
     require => File['/var/lib/zuul/ssh'],
     content => $zuul_ssh_private_key,
   }
 
   file { '/var/lib/zuul/www':
-    ensure => directory,
+    ensure  => directory,
     require => File['/var/lib/zuul'],
   }
 
@@ -225,101 +225,101 @@ class zuul (
   }
 
   file { '/var/lib/zuul/www/jquery.min.js':
-    ensure => link,
-    target => '/usr/share/javascript/jquery/jquery.min.js',
+    ensure  => link,
+    target  => '/usr/share/javascript/jquery/jquery.min.js',
     require => [File['/var/lib/zuul/www'],
                 Package['libjs-jquery']],
   }
 
   vcsrepo { '/opt/twitter-bootstrap':
-    ensure => latest,
+    ensure   => latest,
     provider => git,
     revision => 'v3.1.1',
-    source => 'https://github.com/twbs/bootstrap.git',
+    source   => 'https://github.com/twbs/bootstrap.git',
   }
 
   file { '/var/lib/zuul/www/bootstrap':
-    ensure => link,
-    target => '/opt/twitter-bootstrap/dist',
+    ensure  => link,
+    target  => '/opt/twitter-bootstrap/dist',
     require => [File['/var/lib/zuul/www'],
                 Package['libjs-jquery'],
                 Vcsrepo['/opt/twitter-bootstrap']],
   }
 
   vcsrepo { '/opt/jquery-visibility':
-    ensure => latest,
+    ensure   => latest,
     provider => git,
     revision => 'master',
-    source => 'https://github.com/mathiasbynens/jquery-visibility.git',
+    source   => 'https://github.com/mathiasbynens/jquery-visibility.git',
   }
 
   exec { 'install-jquery-visibility':
-    command => 'yui-compressor -o /var/lib/zuul/www/jquery-visibility.min.js /opt/jquery-visibility/jquery-visibility.js',
-    path => 'bin:/usr/bin',
+    command     => 'yui-compressor -o /var/lib/zuul/www/jquery-visibility.min.js /opt/jquery-visibility/jquery-visibility.js',
+    path        => 'bin:/usr/bin',
     refreshonly => true,
-    subscribe => Vcsrepo['/opt/jquery-visibility'],
-    require => [File['/var/lib/zuul/www'],
+    subscribe   => Vcsrepo['/opt/jquery-visibility'],
+    require     => [File['/var/lib/zuul/www'],
                     Package['yui-compressor'],
                     Vcsrepo['/opt/jquery-visibility']],
   }
 
   vcsrepo { '/opt/graphitejs':
-    ensure => latest,
+    ensure   => latest,
     provider => git,
     revision => 'master',
-    source => 'https://github.com/prestontimmons/graphitejs.git',
+    source   => 'https://github.com/prestontimmons/graphitejs.git',
   }
 
   file { '/var/lib/zuul/www/jquery.graphite.js':
-    ensure => link,
-    target => '/opt/graphitejs/jquery.graphite.js',
+    ensure  => link,
+    target  => '/opt/graphitejs/jquery.graphite.js',
     require => [File['/var/lib/zuul/www'],
                 Vcsrepo['/opt/graphitejs']],
   }
 
   file { '/var/lib/zuul/www/index.html':
-    ensure => link,
-    target => '/opt/zuul/etc/status/public_html/index.html',
+    ensure  => link,
+    target  => '/opt/zuul/etc/status/public_html/index.html',
     require => File['/var/lib/zuul/www'],
   }
 
   file { '/var/lib/zuul/www/styles':
-    ensure => link,
-    target => '/opt/zuul/etc/status/public_html/styles',
+    ensure  => link,
+    target  => '/opt/zuul/etc/status/public_html/styles',
     require => File['/var/lib/zuul/www'],
   }
 
   file { '/var/lib/zuul/www/zuul.app.js':
-    ensure => link,
-    target => '/opt/zuul/etc/status/public_html/zuul.app.js',
+    ensure  => link,
+    target  => '/opt/zuul/etc/status/public_html/zuul.app.js',
     require => File['/var/lib/zuul/www'],
   }
 
   file { '/var/lib/zuul/www/jquery.zuul.js':
-    ensure => link,
-    target => '/opt/zuul/etc/status/public_html/jquery.zuul.js',
+    ensure  => link,
+    target  => '/opt/zuul/etc/status/public_html/jquery.zuul.js',
     require => File['/var/lib/zuul/www'],
   }
 
   file { '/var/lib/zuul/www/images':
-    ensure => link,
-    target => '/opt/zuul/etc/status/public_html/images',
+    ensure  => link,
+    target  => '/opt/zuul/etc/status/public_html/images',
     require => File['/var/lib/zuul/www'],
   }
 
   file { '/etc/init.d/zuul':
     ensure => present,
-    owner => 'root',
-    group => 'root',
-    mode => '0555',
+    owner  => 'root',
+    group  => 'root',
+    mode   => '0555',
     source => 'puppet:///modules/zuul/zuul.init',
   }
 
   file { '/etc/init.d/zuul-merger':
     ensure => present,
-    owner => 'root',
-    group => 'root',
-    mode => '0555',
+    owner  => 'root',
+    group  => 'root',
+    mode   => '0555',
     source => 'puppet:///modules/zuul/zuul-merger.init',
   }
 
@@ -329,53 +329,53 @@ class zuul (
     $ssl = true
     file { '/etc/ssl/certs':
       ensure => directory,
-      owner => 'root',
-      group => 'root',
-      mode => '0755',
+      owner  => 'root',
+      group  => 'root',
+      mode   => '0755',
     }
     file { '/etc/ssl/private':
       ensure => directory,
-      owner => 'root',
-      group => 'root',
-      mode => '0700',
+      owner  => 'root',
+      group  => 'root',
+      mode   => '0700',
     }
     file { "/etc/ssl/certs/${vhost_name}.pem":
-      ensure => present,
-      owner => 'root',
-      group => 'root',
-      mode  => '0644',
+      ensure  => present,
+      owner   => 'root',
+      group   => 'root',
+      mode    => '0644',
       content => $proxy_ssl_cert_file_contents,
       require => File['/etc/ssl/certs'],
-      before => Apache::Vhost[$vhost_name],
+      before  => Apache::Vhost[$vhost_name],
     }
     file { "/etc/ssl/private/${vhost_name}.key":
-      ensure => present,
-      owner => 'root',
-      group => 'root',
-      mode => '0600',
+      ensure  => present,
+      owner   => 'root',
+      group   => 'root',
+      mode    => '0600',
       content => $proxy_ssl_key_file_contents,
       require => File['/etc/ssl/private'],
-      before => Apache::Vhost[$vhost_name],
+      before  => Apache::Vhost[$vhost_name],
     }
     if $proxy_ssl_chain_file_contents != '' {
       file { "/etc/ssl/certs/${vhost_name}_intermediate.pem":
-        ensure => present,
-        owner => 'root',
-        group => 'root',
-        mode => '0644',
+        ensure  => present,
+        owner   => 'root',
+        group   => 'root',
+        mode    => '0644',
         content => $proxy_ssl_cert_file_contents,
         require => File['/etc/ssl/certs'],
-        before => Apache::Vhost[$vhost_name],
+        before  => Apache::Vhost[$vhost_name],
       }
     }
   }
 
   apache::vhost { $vhost_name:
-    port => 443, # Is required despite not being used.
-    docroot => 'MEANINGLESS ARGUMENT',
-    priority => '50',
-    ssl => $ssl,
-    template => 'zuul/zuul.vhost.erb',
+    port       => 443, # Is required despite not being used.
+    docroot    => 'MEANINGLESS ARGUMENT',
+    priority   => '50',
+    ssl        => $ssl,
+    template   => 'zuul/zuul.vhost.erb',
     vhost_name => $vhost_name,
   }
   if ! defined(A2mod['rewrite']) {
