@@ -20,6 +20,7 @@ class zuul::merger (
   service { 'zuul-merger':
     name       => 'zuul-merger',
     enable     => true,
+    ensure     => running,
     hasrestart => true,
     require    => File['/etc/init.d/zuul-merger'],
   }

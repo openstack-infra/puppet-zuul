@@ -21,6 +21,7 @@ class zuul::server (
   service { 'zuul':
     name       => 'zuul',
     enable     => true,
+    ensure     => running,
     hasrestart => true,
     require    => File['/etc/init.d/zuul'],
   }
