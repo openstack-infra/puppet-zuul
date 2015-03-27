@@ -20,6 +20,7 @@ class zuul::server (
   $manage_log_conf = false,
 ) {
   service { 'zuul':
+    ensure     => running,
     name       => 'zuul',
     enable     => true,
     hasrestart => true,
