@@ -19,6 +19,7 @@ class zuul::server (
   $layout_dir = '',
 ) {
   service { 'zuul':
+    ensure     => running,
     name       => 'zuul',
     enable     => true,
     hasrestart => true,

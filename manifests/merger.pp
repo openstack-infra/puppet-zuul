@@ -18,6 +18,7 @@
 class zuul::merger (
 ) {
   service { 'zuul-merger':
+    ensure     => running,
     name       => 'zuul-merger',
     enable     => true,
     hasrestart => true,
