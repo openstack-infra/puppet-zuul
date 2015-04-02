@@ -253,6 +253,13 @@ class zuul (
     source   => 'https://github.com/mathiasbynens/jquery-visibility.git',
   }
 
+  file { '/var/lib/zuul/www/jquery-visibility.js':
+    ensure  => link,
+    target  => '/opt/jquery-visibility/jquery-visibility.js',
+    require => [File['/var/lib/zuul/www'],
+                Vcsrepo['/opt/jquery-visibility']],
+  }
+
   exec { 'install-jquery-visibility':
     command     => 'yui-compressor -o /var/lib/zuul/www/jquery-visibility.min.js /opt/jquery-visibility/jquery-visibility.js',
     path        => 'bin:/usr/bin',
