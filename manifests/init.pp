@@ -225,6 +225,10 @@ class zuul (
   }
 
   file { '/var/lib/zuul/www/jquery.min.js':
+    ensure => absent
+  }
+
+  file { '/var/lib/zuul/www/lib/jquery.min.js':
     ensure  => link,
     target  => '/usr/share/javascript/jquery/jquery.min.js',
     require => [File['/var/lib/zuul/www'],
@@ -239,6 +243,10 @@ class zuul (
   }
 
   file { '/var/lib/zuul/www/bootstrap':
+    ensure => absent
+  }
+
+  file { '/var/lib/zuul/www/lib/bootstrap':
     ensure  => link,
     target  => '/opt/twitter-bootstrap/dist',
     require => [File['/var/lib/zuul/www'],
@@ -253,8 +261,12 @@ class zuul (
     source   => 'https://github.com/mathiasbynens/jquery-visibility.git',
   }
 
+  file { '/var/lib/zuul/www/jquery-visibility.min.js':
+    ensure => absent
+  }
+
   exec { 'install-jquery-visibility':
-    command     => 'yui-compressor -o /var/lib/zuul/www/jquery-visibility.min.js /opt/jquery-visibility/jquery-visibility.js',
+    command     => 'yui-compressor -o /var/lib/zuul/www/lib/jquery-visibility.js /opt/jquery-visibility/jquery-visibility.js',
     path        => 'bin:/usr/bin',
     refreshonly => true,
     subscribe   => Vcsrepo['/opt/jquery-visibility'],
@@ -271,6 +283,10 @@ class zuul (
   }
 
   file { '/var/lib/zuul/www/jquery.graphite.js':
+    ensure => absent
+  }
+
+  file { '/var/lib/zuul/www/lib/jquery.graphite.js':
     ensure  => link,
     target  => '/opt/graphitejs/jquery.graphite.js',
     require => [File['/var/lib/zuul/www'],
