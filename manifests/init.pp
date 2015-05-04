@@ -363,7 +363,7 @@ class zuul (
         owner   => 'root',
         group   => 'root',
         mode    => '0644',
-        content => $proxy_ssl_cert_file_contents,
+        content => $proxy_ssl_chain_file_contents,
         require => File['/etc/ssl/certs'],
         before  => Apache::Vhost[$vhost_name],
       }
