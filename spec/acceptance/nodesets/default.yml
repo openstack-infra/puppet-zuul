@@ -1,0 +1,9 @@
+HOSTS:
+  testnode:
+    roles:
+      - master
+    platform: ubuntu-12.04-amd64
+    hypervisor : none
+    ip: 127.0.0.1
+CONFIG:
+  type: foss
