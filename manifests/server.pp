@@ -17,6 +17,7 @@
 #
 class zuul::server (
   $layout_dir = '',
+  $manage_log_conffiles = false,
 ) {
   service { 'zuul':
     name       => 'zuul',
@@ -42,6 +43,20 @@ class zuul::server (
     source  => $layout_dir,
     require => File['/etc/zuul'],
     notify  => Exec['zuul-reload'],
+  }
+
+  if $manage_log_conffiles {
+    file { '/etc/zuul/logging.conf':
+      ensure => present,
+      source => 'puppet:///modules/zuul/logging.conf',
+      notify => Exec['zuul-reload'],
+    }
+
+    file { '/etc/zuul/gearman-logging.conf':
+      ensure => present,
+      source => 'puppet:///modules/zuul/gearman-logging.conf',
+      notify => Exec['zuul-reload'],
+    }
   }
 
   include logrotate
