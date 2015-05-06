@@ -16,6 +16,7 @@
 # == Class: zuul::merger
 #
 class zuul::merger (
+  $manage_log_conf = false,
 ) {
   service { 'zuul-merger':
     name       => 'zuul-merger',
@@ -32,6 +33,13 @@ class zuul::merger (
     environment => 'PATH=/usr/bin:/bin:/usr/sbin:/sbin',
     require     => [User['zuul'],
                     File['/var/lib/zuul/git']],
+  }
+
+  if $manage_log_conf {
+    file { '/etc/zuul/merger-logging.conf':
+      ensure => present,
+      source => 'puppet:///modules/zuul/merger-logging.conf',
+    }
   }
 
   include logrotate
