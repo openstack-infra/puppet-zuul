@@ -220,6 +220,11 @@ class zuul (
     require => File['/var/lib/zuul'],
   }
 
+  file { '/var/lib/zuul/www/lib':
+    ensure  => directory,
+    require => File['/var/lib/zuul/www'],
+  }
+
   package { 'libjs-jquery':
     ensure => present,
   }
@@ -231,7 +236,7 @@ class zuul (
   file { '/var/lib/zuul/www/lib/jquery.min.js':
     ensure  => link,
     target  => '/usr/share/javascript/jquery/jquery.min.js',
-    require => [File['/var/lib/zuul/www'],
+    require => [File['/var/lib/zuul/www/lib'],
                 Package['libjs-jquery']],
   }
 
@@ -249,7 +254,7 @@ class zuul (
   file { '/var/lib/zuul/www/lib/bootstrap':
     ensure  => link,
     target  => '/opt/twitter-bootstrap/dist',
-    require => [File['/var/lib/zuul/www'],
+    require => [File['/var/lib/zuul/www/lib'],
                 Package['libjs-jquery'],
                 Vcsrepo['/opt/twitter-bootstrap']],
   }
@@ -270,7 +275,7 @@ class zuul (
     path        => 'bin:/usr/bin',
     refreshonly => true,
     subscribe   => Vcsrepo['/opt/jquery-visibility'],
-    require     => [File['/var/lib/zuul/www'],
+    require     => [File['/var/lib/zuul/www/lib'],
                     Package['yui-compressor'],
                     Vcsrepo['/opt/jquery-visibility']],
   }
@@ -289,14 +294,14 @@ class zuul (
   file { '/var/lib/zuul/www/lib/jquery.graphite.js':
     ensure  => link,
     target  => '/opt/graphitejs/jquery.graphite.js',
-    require => [File['/var/lib/zuul/www'],
+    require => [File['/var/lib/zuul/www/lib'],
                 Vcsrepo['/opt/graphitejs']],
   }
 
   file { '/var/lib/zuul/www/index.html':
     ensure  => link,
     target  => '/opt/zuul/etc/status/public_html/index.html',
-    require => File['/var/lib/zuul/www'],
+    require => File['/var/lib/zuul/www/lib'],
   }
 
   file { '/var/lib/zuul/www/styles':
