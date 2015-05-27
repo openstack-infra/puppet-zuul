@@ -188,9 +188,9 @@ class zuul (
   }
 
   file { '/var/lib/zuul':
-    ensure  => directory,
-    owner   => 'zuul',
-    group   => 'zuul',
+    ensure => directory,
+    owner  => 'zuul',
+    group  => 'zuul',
   }
 
   file { '/var/lib/zuul/git':
