@@ -16,7 +16,7 @@
 # == Class: zuul::merger
 #
 class zuul::merger (
-  $manage_log_conf = false,
+  $manage_log_conf = true,
 ) {
   service { 'zuul-merger':
     name       => 'zuul-merger',

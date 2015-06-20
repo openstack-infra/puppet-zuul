@@ -17,7 +17,7 @@
 #
 class zuul::server (
   $layout_dir = '',
-  $manage_log_conf = false,
+  $manage_log_conf = true,
 ) {
   service { 'zuul':
     name       => 'zuul',
