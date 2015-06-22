@@ -46,14 +46,18 @@ do_start()
         mkdir -p /var/run/$NAME
 	chown $USER /var/run/$NAME
 	ulimit -n 8192
-	start-stop-daemon --start --quiet --pidfile $PIDFILE -c $USER --exec $DAEMON --test > /dev/null \
-		|| return 1
-	start-stop-daemon --start --quiet --pidfile $PIDFILE -c $USER --exec $DAEMON -- \
-		$DAEMON_ARGS \
-		|| return 2
-	# Add code here, if necessary, that waits for the process to be ready
-	# to handle requests from services started subsequently which depend
-	# on this one.  As a last resort, sleep for some time.
+	if [ -f $PIDFILE ]; then
+        	echo "Pidfile already exists, run service zuul-merger stop to clean up."
+    	else
+        	start-stop-daemon --start --quiet --pidfile $PIDFILE -c $USER --exec $DAEMON --test > /dev/null \
+		    	|| return 1
+	    	start-stop-daemon --start --quiet --pidfile $PIDFILE -c $USER --exec $DAEMON -- \
+			$DAEMON_ARGS \
+			|| return 2
+	    	# Add code here, if necessary, that waits for the process to be ready
+	    	# to handle requests from services started subsequently which depend
+	    	# on this one.  As a last resort, sleep for some time.
+    	fi
 }
 
 #
