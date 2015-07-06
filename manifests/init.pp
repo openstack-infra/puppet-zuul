@@ -419,8 +419,8 @@ class zuul (
       ensure => present,
     }
   }
-  if ! defined(Httpd_mod['cgi']) {
-    httpd_mod { 'cgi':
+  if ! defined(Httpd_mod['cgid']) {
+    httpd_mod { 'cgid':
       ensure => present,
     }
   }
