@@ -419,8 +419,8 @@ class zuul (
       ensure => present,
     }
   }
-  if ! defined(A2mod['cgi']) {
-    a2mod { 'cgi':
+  if ! defined(A2mod['cgid']) {
+    a2mod { 'cgid':
       ensure => present,
     }
   }
