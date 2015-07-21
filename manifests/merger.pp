@@ -42,7 +42,7 @@ class zuul::merger (
     }
   }
 
-  include logrotate
+  include ::logrotate
   logrotate::file { 'merger.log':
     log     => '/var/log/zuul/merger.log',
     options => [
