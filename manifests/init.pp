@@ -22,38 +22,38 @@ class zuul (
   $serveradmin = "webmaster@${::fqdn}",
   $gearman_server = '127.0.0.1',
   $internal_gearman = true,
-  $gerrit_server = '',
-  $gerrit_user = '',
-  $gerrit_baseurl = '',
-  $zuul_ssh_private_key = '',
-  $url_pattern = '',
+  $gerrit_server = undef,
+  $gerrit_user = undef,
+  $gerrit_baseurl = undef,
+  $zuul_ssh_private_key = undef,
+  $url_pattern = undef,
   $status_url = "https://${::fqdn}/",
-  $zuul_url = '',
+  $zuul_url = undef,
   $git_source_repo = 'https://git.openstack.org/openstack-infra/zuul',
   $job_name_in_report = false,
   $revision = 'master',
-  $statsd_host = '',
-  $git_email = '',
-  $git_name = '',
+  $statsd_host = undef,
+  $git_email = undef,
+  $git_name = undef,
   $smtp_host = 'localhost',
   $smtp_port = 25,
   $smtp_default_from = "zuul@${::fqdn}",
   $smtp_default_to = "zuul.reports@${::fqdn}",
-  $swift_authurl = '',
-  $swift_auth_version = '',
-  $swift_user = '',
-  $swift_key = '',
-  $swift_tenant_name = '',
-  $swift_region_name = '',
-  $swift_default_container = '',
-  $swift_default_logserver_prefix = '',
+  $swift_authurl = undef,
+  $swift_auth_version = undef,
+  $swift_user = undef,
+  $swift_key = undef,
+  $swift_tenant_name = undef,
+  $swift_region_name = undef,
+  $swift_default_container = undef,
+  $swift_default_logserver_prefix = undef,
   $swift_default_expiry = 7200,
-  $proxy_ssl_cert_file_contents = '',
-  $proxy_ssl_key_file_contents = '',
-  $proxy_ssl_chain_file_contents = '',
+  $proxy_ssl_cert_file_contents = undef,
+  $proxy_ssl_key_file_contents = undef,
+  $proxy_ssl_chain_file_contents = undef,
 ) {
   include ::httpd
-  include pip
+  include ::pip
 
   $packages = [
     'gcc',  # yappi requires this to build
@@ -344,7 +344,7 @@ class zuul (
     source => 'puppet:///modules/zuul/zuul-merger.init',
   }
 
-  if $proxy_ssl_cert_file_contents == '' {
+  if $proxy_ssl_cert_file_contents == undef {
     $ssl = false
   } else {
     $ssl = true
@@ -378,7 +378,7 @@ class zuul (
       require => File['/etc/ssl/private'],
       before  => Httpd::Vhost[$vhost_name],
     }
-    if $proxy_ssl_chain_file_contents != '' {
+    if $proxy_ssl_chain_file_contents != undef {
       file { "/etc/ssl/certs/${vhost_name}_intermediate.pem":
         ensure  => present,
         owner   => 'root',
