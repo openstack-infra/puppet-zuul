@@ -50,7 +50,7 @@
   </IfModule>
 </VirtualHost>
 
-<% if @proxy_ssl_cert_file_contents != undef %>
+<% if @proxy_ssl_cert_file_contents != nil %>
 <IfModule mod_ssl.c>
 <VirtualHost *:443>
   ServerName <%= @vhost_name %>
@@ -60,7 +60,7 @@
   SSLProtocol All -SSLv2 -SSLv3
   SSLCertificateFile /etc/ssl/certs/<%= @vhost_name %>.pem
   SSLCertificateKeyFile /etc/ssl/private/<%= @vhost_name %>.key
-<% if @proxy_ssl_chain_file_contents != undef %>
+<% if @proxy_ssl_chain_file_contents != nil %>
   SSLCertificateChainFile /etc/ssl/certs/<%= @vhost_name %>_intermediate.pem
 <% end %>
 
