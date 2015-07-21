@@ -16,7 +16,7 @@
 # == Class: zuul::server
 #
 class zuul::server (
-  $layout_dir = '',
+  $layout_dir = undef,
   $manage_log_conf = true,
 ) {
   service { 'zuul':
@@ -59,7 +59,7 @@ class zuul::server (
     }
   }
 
-  include logrotate
+  include ::logrotate
   logrotate::file { 'zuul.log':
     log     => '/var/log/zuul/zuul.log',
     options => [
