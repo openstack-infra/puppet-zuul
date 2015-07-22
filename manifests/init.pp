@@ -20,7 +20,7 @@
 class zuul (
   $vhost_name = $::fqdn,
   $serveradmin = "webmaster@${::fqdn}",
-  $gearman_server = '127.0.0.1',
+  $gearman_server = '0.0.0.0',
   $internal_gearman = true,
   $gerrit_server = '',
   $gerrit_user = '',
