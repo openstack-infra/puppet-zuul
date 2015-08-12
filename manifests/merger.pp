@@ -19,7 +19,6 @@ class zuul::merger (
   $manage_log_conf = true,
 ) {
   service { 'zuul-merger':
-    ensure     => running,
     name       => 'zuul-merger',
     enable     => true,
     hasrestart => true,
