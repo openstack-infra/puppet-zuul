@@ -1,0 +1,15 @@
+Verified+2: Jenkins
+Code-Review+1: K Jonathan Harker <code@gentlydownthe.net>
+Code-Review+2: yolanda.robla <info@ysoft.biz>
+Code-Review+2: Spencer Krum <nibz@spencerkrum.com>
+Workflow+1: Spencer Krum <nibz@spencerkrum.com>
+Code-Review+2: Joshua Hesketh <joshua.hesketh@rackspace.com>
+Code-Review+1: Colleen Murphy <colleen@gazlene.net>
+Code-Review+1: Ramy Asselin <ramy.asselin@hp.com>
+Code-Review+1: Stephanie Miller <stephane@alum.mit.edu>
+Code-Review+1: Clint Adams <clint@gcfm.net>
+Submitted-by: Jenkins
+Submitted-at: Wed, 12 Aug 2015 20:05:17 +0000
+Reviewed-on: https://review.openstack.org/168306
+Project: openstack-infra/puppet-zuul
+Branch: refs/heads/master
