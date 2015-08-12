@@ -19,6 +19,10 @@
   CustomLog ${APACHE_LOG_DIR}/<%= @vhost_name %>-access.log combined
 
   RewriteEngine on
+  <% @block_referers.each do |referer| -%>
+  RewriteCond %{HTTP_REFERER} =<%= referer %>
+  RewriteRule ^/status.json - [F]
+  <% end -%>
   RewriteRule ^/status.json$ http://127.0.0.1:8001/status.json [P]
   RewriteRule ^/status/(.*) http://127.0.0.1:8001/status/$1 [P]
 
@@ -80,6 +84,10 @@
   CustomLog ${APACHE_LOG_DIR}/<%= @vhost_name %>-access.log combined
 
   RewriteEngine on
+  <% @block_referers.each do |referer| -%>
+  RewriteCond %{HTTP_REFERER} =<%= referer %>
+  RewriteRule ^/status.json - [F]
+  <% end -%>
   RewriteRule ^/status.json$ http://127.0.0.1:8001/status.json [P]
   RewriteRule ^/status/(.*) http://127.0.0.1:8001/status/$1 [P]
 

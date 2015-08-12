@@ -51,6 +51,7 @@ class zuul (
   $proxy_ssl_cert_file_contents = '',
   $proxy_ssl_key_file_contents = '',
   $proxy_ssl_chain_file_contents = '',
+  $block_referers = [],
 ) {
   include ::httpd
   include pip
