@@ -403,26 +403,31 @@ class zuul (
   if ! defined(Httpd_mod['rewrite']) {
     httpd_mod { 'rewrite':
       ensure => present,
+      before => Service['httpd'],
     }
   }
   if ! defined(Httpd_mod['proxy']) {
     httpd_mod { 'proxy':
       ensure => present,
+      before => Service['httpd'],
     }
   }
   if ! defined(Httpd_mod['proxy_http']) {
     httpd_mod { 'proxy_http':
       ensure => present,
+      before => Service['httpd'],
     }
   }
   if ! defined(Httpd_mod['cache']) {
     httpd_mod { 'cache':
       ensure => present,
+      before => Service['httpd'],
     }
   }
   if ! defined(Httpd_mod['cgid']) {
     httpd_mod { 'cgid':
       ensure => present,
+      before => Service['httpd'],
     }
   }
 
@@ -431,6 +436,7 @@ class zuul (
       if ! defined(Httpd_mod['mem_cache']) {
         httpd_mod { 'mem_cache':
           ensure => present,
+          before => Service['httpd'],
         }
       }
     }
@@ -438,6 +444,7 @@ class zuul (
       if ! defined(Httpd_mod['cache_disk']) {
         httpd_mod { 'cache_disk':
           ensure => present,
+          before => Service['httpd'],
         }
       }
     }
