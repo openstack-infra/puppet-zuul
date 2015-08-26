@@ -27,3 +27,9 @@ group :development, :test do
     gem 'puppet', '~> 3.0', :require => false
   end
 end
+
+group :system_tests do
+  gem 'beaker-rspec', :require => false
+end
+
+# vim:ft=ruby
