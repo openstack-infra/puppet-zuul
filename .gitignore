@@ -1,0 +1,5 @@
+Gemfile.lock
+.bundled_gems/
+log/
+junit/
+.vagrant/
