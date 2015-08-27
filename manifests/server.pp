@@ -59,8 +59,8 @@ class zuul::server (
     }
   }
 
-  include logrotate
-  logrotate::file { 'zuul.log':
+  include ::logrotate
+  ::logrotate::file { 'zuul.log':
     log     => '/var/log/zuul/zuul.log',
     options => [
       'compress',
@@ -71,7 +71,7 @@ class zuul::server (
     ],
     require => Service['zuul'],
   }
-  logrotate::file { 'zuul-debug.log':
+  ::logrotate::file { 'zuul-debug.log':
     log     => '/var/log/zuul/debug.log',
     options => [
       'compress',
