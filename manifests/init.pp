@@ -54,7 +54,7 @@ class zuul (
   $block_referers = [],
 ) {
   include ::httpd
-  include pip
+  include ::pip
 
   $packages = [
     'gcc',  # yappi requires this to build
