@@ -1,0 +1,13 @@
+[Unit]
+Description=Run Zuul scheduler.
+After=syslog.target network.target
+
+[Service]
+User=zuul
+Group=nobody
+Type=simple
+ExecStart=/usr/bin/zuul-server -d
+ExecReload=/bin/kill -HUP $MAINPID
+
+[Install]
+WantedBy=multi-user.target

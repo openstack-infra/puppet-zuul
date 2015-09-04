@@ -19,17 +19,32 @@ class zuul::server (
   $layout_dir = '',
   $manage_log_conf = true,
 ) {
+
+  case $::osfamily {
+    'RedHat': {
+      $service_file = '/etc/systemd/system/zuul.service'
+      exec { 'zuul-reload':
+        path        => "/usr/sbin/",
+        command     => 'service zuul reload',
+        require     => File[$service_file],
+        refreshonly => true,
+      }
+    }
+    'Debian': {
+      $service_file = '/etc/init.d/zuul'
+      exec { 'zuul-reload':
+        command     => '/etc/init.d/zuul reload',
+        require     => File[$service_file],
+        refreshonly => true,
+      }
+    }
+  }
+
   service { 'zuul':
     name       => 'zuul',
     enable     => true,
     hasrestart => true,
-    require    => File['/etc/init.d/zuul'],
-  }
-
-  exec { 'zuul-reload':
-    command     => '/etc/init.d/zuul reload',
-    require     => File['/etc/init.d/zuul'],
-    refreshonly => true,
+    require    => File[$service_file],
   }
 
   file { '/etc/zuul/layout':

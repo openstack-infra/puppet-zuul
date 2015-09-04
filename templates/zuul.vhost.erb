@@ -4,19 +4,29 @@
   DocumentRoot /var/lib/zuul/www
 
   <Directory /var/lib/zuul/www>
+    <% if @osfamily == "Debian" %>
     Allow from all
     Satisfy Any
+    <% end %>
+    <% if @osfamily == "RedHat" %>
+    Require all granted
+    <% end %>
   </Directory>
-  <Directory /usr/lib/git-core>
+  <Directory <%= @git_core_path %>>
+    <% if @osfamily == "Debian" %>
     Allow from all
     Satisfy Any
+    <% end %>
+    <% if @osfamily == "RedHat" %>
+    Require all granted
+    <% end %>
   </Directory>
 
-  ErrorLog ${APACHE_LOG_DIR}/<%= @vhost_name %>-error.log
+  ErrorLog <%= @apache_log_path %>/<%= @vhost_name %>-error.log
 
   LogLevel warn
 
-  CustomLog ${APACHE_LOG_DIR}/<%= @vhost_name %>-access.log combined
+  CustomLog <%= @apache_log_path %>/<%= @vhost_name %>-access.log combined
 
   RewriteEngine on
   <% @block_referers.each do |referer| -%>
@@ -33,7 +43,7 @@
 
   AliasMatch ^/p/(.*/objects/[0-9a-f]{2}/[0-9a-f]{38})$ /var/lib/zuul/git/$1
   AliasMatch ^/p/(.*/objects/pack/pack-[0-9a-f]{40}.(pack|idx))$ /var/lib/zuul/git/$1
-  ScriptAlias /p/ /usr/lib/git-core/git-http-backend/
+  ScriptAlias /p/ <%= @git_core_path %>/git-http-backend/
 
   <IfModule mod_cache.c>
     CacheDefaultExpire 5
@@ -69,19 +79,29 @@
 <% end %>
 
   <Directory /var/lib/zuul/www>
+    <% if @osfamily == "Debian" %>
     Allow from all
     Satisfy Any
+    <% end %>
+    <% if @osfamily == "RedHat" %>
+    Require all granted
+    <% end %>
   </Directory>
-  <Directory /usr/lib/git-core>
+  <Directory <%= @git_core_path %>>
+    <% if @osfamily == "Debian" %>
     Allow from all
     Satisfy Any
+    <% end %>
+    <% if @osfamily == "RedHat" %>
+    Require all granted
+    <% end %>
   </Directory>
 
-  ErrorLog ${APACHE_LOG_DIR}/<%= @vhost_name %>-error.log
+  ErrorLog <%= @apache_log_path %>/<%= @vhost_name %>-error.log
 
   LogLevel warn
 
-  CustomLog ${APACHE_LOG_DIR}/<%= @vhost_name %>-access.log combined
+  CustomLog <%= @apache_log_path %>/<%= @vhost_name %>-access.log combined
 
   RewriteEngine on
   <% @block_referers.each do |referer| -%>
@@ -98,7 +118,7 @@
 
   AliasMatch ^/p/(.*/objects/[0-9a-f]{2}/[0-9a-f]{38})$ /var/lib/zuul/git/$1
   AliasMatch ^/p/(.*/objects/pack/pack-[0-9a-f]{40}.(pack|idx))$ /var/lib/zuul/git/$1
-  ScriptAlias /p/ /usr/lib/git-core/git-http-backend/
+  ScriptAlias /p/ <%= @git_core_path %>/git-http-backend/
 
   <IfModule mod_cache.c>
     CacheDefaultExpire 5

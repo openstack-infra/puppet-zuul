@@ -62,6 +62,115 @@ class zuul (
     'python-webob',
   ]
 
+  case $::osfamily {
+    'RedHat': {
+      $yaml_package    = 'PyYAML'
+      $jquery_package  = 'js-jquery'
+      $jquery_path     = '/usr/share/javascript/jquery/2.1.3/jquery.min.js'
+      $apache_log_path = '/var/log/httpd'
+      $git_core_path   = '/usr/libexec/git-core'
+      file { '/etc/systemd/system/zuul.service':
+        ensure => present,
+        owner  => 'root',
+        group  => 'root',
+        mode   => '0555',
+        source => 'puppet:///modules/zuul/zuul.service',
+      }
+
+      file { '/etc/systemd/system/zuul-merger.service':
+        ensure => present,
+        owner  => 'root',
+        group  => 'root',
+        mode   => '0555',
+        source => 'puppet:///modules/zuul/zuul-merger.service',
+      }
+    }
+    'Debian': {
+      $yaml_package = 'python-yaml'
+      $jquery_package = 'libjs-jquery'
+      $jquery_path  = '/usr/share/javascript/jquery/jquery.min.js'
+      $apache_log_path = '/var/log/apache2'
+      $git_core_path   = '/usr/lib/git-core'
+      if ! defined(Package['yui-compressor']) {
+        package { 'yui-compressor':
+          ensure => present,
+        }
+      }
+      exec { 'install-jquery-visibility':
+        command     => 'yui-compressor -o /var/lib/zuul/www/lib/jquery-visibility.js /opt/jquery-visibility/jquery-visibility.js',
+        path        => 'bin:/usr/bin',
+        refreshonly => true,
+        subscribe   => Vcsrepo['/opt/jquery-visibility'],
+        require     => [File['/var/lib/zuul/www/lib'],
+                        Package['yui-compressor'],
+                        Vcsrepo['/opt/jquery-visibility']],
+      }
+      file { '/etc/init.d/zuul':
+        ensure => present,
+        owner  => 'root',
+        group  => 'root',
+        mode   => '0555',
+        source => 'puppet:///modules/zuul/zuul.init',
+      }
+
+      file { '/etc/init.d/zuul-merger':
+        ensure => present,
+        owner  => 'root',
+        group  => 'root',
+        mode   => '0555',
+        source => 'puppet:///modules/zuul/zuul-merger.init',
+      }
+      if ! defined(Httpd_mod['rewrite']) {
+        httpd_mod { 'rewrite':
+          ensure => present,
+          before => Service['httpd'],
+        }
+      }
+      if ! defined(Httpd_mod['proxy']) {
+        httpd_mod { 'proxy':
+          ensure => present,
+          before => Service['httpd'],
+        }
+      }
+      if ! defined(Httpd_mod['proxy_http']) {
+        httpd_mod { 'proxy_http':
+          ensure => present,
+          before => Service['httpd'],
+        }
+      }
+      if ! defined(Httpd_mod['cache']) {
+        httpd_mod { 'cache':
+          ensure => present,
+          before => Service['httpd'],
+        }
+      }
+      if ! defined(Httpd_mod['cgid']) {
+        httpd_mod { 'cgid':
+          ensure => present,
+          before => Service['httpd'],
+        }
+      }
+      case $::lsbdistcodename {
+        'precise': {
+          if ! defined(Httpd_mod['mem_cache']) {
+            httpd_mod { 'mem_cache':
+              ensure => present,
+              before => Service['httpd'],
+            }
+          }
+        }
+        default: {
+          if ! defined(Httpd_mod['cache_disk']) {
+            httpd_mod { 'cache_disk':
+              ensure => present,
+              before => Service['httpd'],
+            }
+          }
+        }
+      }
+    }
+  }
+
   package { $packages:
     ensure => present,
   }
@@ -82,8 +191,8 @@ class zuul (
 
   # A lot of things need yaml, be conservative requiring this package to avoid
   # conflicts with other modules.
-  if ! defined(Package['python-yaml']) {
-    package { 'python-yaml':
+  if ! defined(Package[$yaml_package]) {
+    package { $yaml_package:
       ensure => present,
     }
   }
@@ -96,12 +205,6 @@ class zuul (
 
   if ! defined(Package['python-daemon']) {
     package { 'python-daemon':
-      ensure => present,
-    }
-  }
-
-  if ! defined(Package['yui-compressor']) {
-    package { 'yui-compressor':
       ensure => present,
     }
   }
@@ -139,9 +242,8 @@ class zuul (
       Package['python-paramiko'],
       Package['python-paste'],
       Package['python-webob'],
-      Package['python-yaml'],
+      Package[$yaml_package],
       Package['yappi'],
-      Package['yui-compressor'],
     ],
   }
 
@@ -226,7 +328,7 @@ class zuul (
     require => File['/var/lib/zuul/www'],
   }
 
-  package { 'libjs-jquery':
+  package { $jquery_package :
     ensure => present,
   }
 
@@ -236,9 +338,9 @@ class zuul (
 
   file { '/var/lib/zuul/www/lib/jquery.min.js':
     ensure  => link,
-    target  => '/usr/share/javascript/jquery/jquery.min.js',
+    target  => $jquery_path,
     require => [File['/var/lib/zuul/www/lib'],
-                Package['libjs-jquery']],
+                Package[$jquery_package]],
   }
 
   vcsrepo { '/opt/twitter-bootstrap':
@@ -256,7 +358,6 @@ class zuul (
     ensure  => link,
     target  => '/opt/twitter-bootstrap/dist',
     require => [File['/var/lib/zuul/www/lib'],
-                Package['libjs-jquery'],
                 Vcsrepo['/opt/twitter-bootstrap']],
   }
 
@@ -271,15 +372,6 @@ class zuul (
     ensure => absent
   }
 
-  exec { 'install-jquery-visibility':
-    command     => 'yui-compressor -o /var/lib/zuul/www/lib/jquery-visibility.js /opt/jquery-visibility/jquery-visibility.js',
-    path        => 'bin:/usr/bin',
-    refreshonly => true,
-    subscribe   => Vcsrepo['/opt/jquery-visibility'],
-    require     => [File['/var/lib/zuul/www/lib'],
-                    Package['yui-compressor'],
-                    Vcsrepo['/opt/jquery-visibility']],
-  }
 
   vcsrepo { '/opt/graphitejs':
     ensure   => latest,
@@ -327,22 +419,6 @@ class zuul (
     ensure  => link,
     target  => '/opt/zuul/etc/status/public_html/images',
     require => File['/var/lib/zuul/www'],
-  }
-
-  file { '/etc/init.d/zuul':
-    ensure => present,
-    owner  => 'root',
-    group  => 'root',
-    mode   => '0555',
-    source => 'puppet:///modules/zuul/zuul.init',
-  }
-
-  file { '/etc/init.d/zuul-merger':
-    ensure => present,
-    owner  => 'root',
-    group  => 'root',
-    mode   => '0555',
-    source => 'puppet:///modules/zuul/zuul-merger.init',
   }
 
   if $proxy_ssl_cert_file_contents == '' {
@@ -400,54 +476,4 @@ class zuul (
     template   => 'zuul/zuul.vhost.erb',
     vhost_name => $vhost_name,
   }
-  if ! defined(Httpd_mod['rewrite']) {
-    httpd_mod { 'rewrite':
-      ensure => present,
-      before => Service['httpd'],
-    }
-  }
-  if ! defined(Httpd_mod['proxy']) {
-    httpd_mod { 'proxy':
-      ensure => present,
-      before => Service['httpd'],
-    }
-  }
-  if ! defined(Httpd_mod['proxy_http']) {
-    httpd_mod { 'proxy_http':
-      ensure => present,
-      before => Service['httpd'],
-    }
-  }
-  if ! defined(Httpd_mod['cache']) {
-    httpd_mod { 'cache':
-      ensure => present,
-      before => Service['httpd'],
-    }
-  }
-  if ! defined(Httpd_mod['cgid']) {
-    httpd_mod { 'cgid':
-      ensure => present,
-      before => Service['httpd'],
-    }
-  }
-
-  case $::lsbdistcodename {
-    'precise': {
-      if ! defined(Httpd_mod['mem_cache']) {
-        httpd_mod { 'mem_cache':
-          ensure => present,
-          before => Service['httpd'],
-        }
-      }
-    }
-    default: {
-      if ! defined(Httpd_mod['cache_disk']) {
-        httpd_mod { 'cache_disk':
-          ensure => present,
-          before => Service['httpd'],
-        }
-      }
-    }
-  }
-
 }

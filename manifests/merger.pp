@@ -18,11 +18,19 @@
 class zuul::merger (
   $manage_log_conf = true,
 ) {
+  case $::osfamily {
+    'RedHat': {
+      $service_file = '/etc/systemd/system/zuul.service'
+    }
+    'Debian': {
+      $service_file = '/etc/init.d/zuul'
+    }
+  }
   service { 'zuul-merger':
     name       => 'zuul-merger',
     enable     => true,
     hasrestart => true,
-    require    => File['/etc/init.d/zuul-merger'],
+    require    => File[$service_file],
   }
 
   cron { 'zuul_repack':
