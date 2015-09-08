@@ -18,12 +18,14 @@
 class zuul::server (
   $layout_dir = '',
   $manage_log_conf = true,
+  $ensure = undef,
 ) {
   service { 'zuul':
     name       => 'zuul',
     enable     => true,
     hasrestart => true,
     require    => File['/etc/init.d/zuul'],
+    ensure     => $ensure,
   }
 
   exec { 'zuul-reload':

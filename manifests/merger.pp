@@ -17,12 +17,14 @@
 #
 class zuul::merger (
   $manage_log_conf = true,
+  $ensure = undef,
 ) {
   service { 'zuul-merger':
     name       => 'zuul-merger',
     enable     => true,
     hasrestart => true,
     require    => File['/etc/init.d/zuul-merger'],
+    ensure     => $ensure,
   }
 
   cron { 'zuul_repack':
