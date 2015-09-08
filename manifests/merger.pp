@@ -16,6 +16,7 @@
 # == Class: zuul::merger
 #
 class zuul::merger (
+  $ensure = undef,
   $manage_log_conf = true,
 ) {
   service { 'zuul-merger':
@@ -23,6 +24,7 @@ class zuul::merger (
     enable     => true,
     hasrestart => true,
     require    => File['/etc/init.d/zuul-merger'],
+    ensure     => $ensure,
   }
 
   cron { 'zuul_repack':

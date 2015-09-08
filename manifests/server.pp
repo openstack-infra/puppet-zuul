@@ -16,6 +16,7 @@
 # == Class: zuul::server
 #
 class zuul::server (
+  $ensure = undef,
   $layout_dir = '',
   $manage_log_conf = true,
 ) {
@@ -24,6 +25,7 @@ class zuul::server (
     enable     => true,
     hasrestart => true,
     require    => File['/etc/init.d/zuul'],
+    ensure     => $ensure,
   }
 
   exec { 'zuul-reload':
