@@ -16,10 +16,12 @@
 # == Class: zuul::server
 #
 class zuul::server (
+  $ensure = undef,
   $layout_dir = '',
   $manage_log_conf = true,
 ) {
   service { 'zuul':
+    ensure     => $ensure,
     name       => 'zuul',
     enable     => true,
     hasrestart => true,
