@@ -42,8 +42,8 @@ class zuul::merger (
     }
   }
 
-  include logrotate
-  logrotate::file { 'merger.log':
+  include ::logrotate
+  ::logrotate::file { 'merger.log':
     log     => '/var/log/zuul/merger.log',
     options => [
       'compress',
@@ -54,7 +54,7 @@ class zuul::merger (
     ],
     require => Service['zuul-merger'],
   }
-  logrotate::file { 'merger-debug.log':
+  ::logrotate::file { 'merger-debug.log':
     log     => '/var/log/zuul/merger-debug.log',
     options => [
       'compress',
