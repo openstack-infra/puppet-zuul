@@ -39,6 +39,7 @@ class zuul (
   $smtp_port = 25,
   $smtp_default_from = "zuul@${::fqdn}",
   $smtp_default_to = "zuul.reports@${::fqdn}",
+  $swift_account_temp_key = '',
   $swift_authurl = '',
   $swift_auth_version = '',
   $swift_user = '',

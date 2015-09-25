@@ -34,6 +34,9 @@ git_user_name=<%= @git_name %>
 
 <% if @swift_authurl != "" -%>
 [swift]
+<% if @swift_account_temp_key != "" -%>
+X-Account-Meta-Temp-Url-Key=<%= @swift_account_temp_key %>
+<% end -%>
 authurl=<%= @swift_authurl %>
 user=<%= @swift_user %>
 key=<%= @swift_key %>
