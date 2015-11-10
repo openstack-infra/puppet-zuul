@@ -4,12 +4,22 @@
   DocumentRoot /var/lib/zuul/www
 
   <Directory /var/lib/zuul/www>
-    Allow from all
-    Satisfy Any
+      <IfVersion >= 2.4>
+          Require all granted
+      </IfVersion>
+      <IfVersion < 2.4>
+          Order deny,allow
+          Allow from all
+      </IfVersion>
   </Directory>
   <Directory /usr/lib/git-core>
-    Allow from all
-    Satisfy Any
+      <IfVersion >= 2.4>
+          Require all granted
+      </IfVersion>
+      <IfVersion < 2.4>
+          Order deny,allow
+          Allow from all
+      </IfVersion>
   </Directory>
 
   ErrorLog ${APACHE_LOG_DIR}/<%= @vhost_name %>-error.log
