@@ -400,52 +400,34 @@ class zuul (
     template   => 'zuul/zuul.vhost.erb',
     vhost_name => $vhost_name,
   }
-  if ! defined(Httpd_mod['rewrite']) {
-    httpd_mod { 'rewrite':
-      ensure => present,
-      before => Service['httpd'],
-    }
+  if ! defined(Httpd::Mod['rewrite']) {
+    httpd::mod { 'rewrite': ensure => present }
   }
-  if ! defined(Httpd_mod['proxy']) {
-    httpd_mod { 'proxy':
-      ensure => present,
-      before => Service['httpd'],
-    }
+  if ! defined(Httpd::Mod['proxy']) {
+    httpd::mod { 'proxy': ensure => present }
   }
-  if ! defined(Httpd_mod['proxy_http']) {
-    httpd_mod { 'proxy_http':
-      ensure => present,
-      before => Service['httpd'],
-    }
+  if ! defined(Httpd::Mod['proxy_http']) {
+    httpd::mod { 'proxy_http': ensure => present }
   }
-  if ! defined(Httpd_mod['cache']) {
-    httpd_mod { 'cache':
-      ensure => present,
-      before => Service['httpd'],
-    }
+  if ! defined(Httpd::Mod['cache']) {
+    httpd::mod { 'cache': ensure => present }
   }
-  if ! defined(Httpd_mod['cgid']) {
-    httpd_mod { 'cgid':
-      ensure => present,
-      before => Service['httpd'],
-    }
+  if ! defined(Httpd::Mod['cgid']) {
+    httpd::mod { 'cgid': ensure => present }
   }
 
   case $::lsbdistcodename {
     'precise': {
-      if ! defined(Httpd_mod['mem_cache']) {
-        httpd_mod { 'mem_cache':
-          ensure => present,
-          before => Service['httpd'],
-        }
+      if ! defined(Httpd::Mod['mem_cache']) {
+        httpd::mod { 'mem_cache': ensure => present }
+      }
+      if ! defined(Httpd::Mod['version']) {
+        httpd::mod { 'version': ensure => present }
       }
     }
     default: {
-      if ! defined(Httpd_mod['cache_disk']) {
-        httpd_mod { 'cache_disk':
-          ensure => present,
-          before => Service['httpd'],
-        }
+      if ! defined(Httpd::Mod['cache_disk']) {
+        httpd::mod { 'cache_disk': ensure => present }
       }
     }
   }
