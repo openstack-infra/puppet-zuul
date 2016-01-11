@@ -1,0 +1,2 @@
+Host review.openstack.org
+    IdentityFile /var/lib/zuul/ssh/id_rsa

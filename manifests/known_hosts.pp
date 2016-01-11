@@ -34,4 +34,11 @@ class zuul::known_hosts (
     replace => true,
     require => File['/home/zuul/.ssh'],
   }
+  file { '/home/zuul/.ssh/config':
+    owner   => 'zuul',
+    group   => 'zuul',
+    mode    => '0600',
+    require => File['/home/zuul/.ssh'],
+    content => file('zuul/ssh-config'),
+  }
 }
