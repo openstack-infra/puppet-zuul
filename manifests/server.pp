@@ -16,8 +16,8 @@
 # == Class: zuul::server
 #
 class zuul::server (
-  $ensure = undef,
-  $layout_dir = '',
+  $ensure          = undef,
+  $layout_dir      = '',
   $manage_log_conf = true,
 ) {
   service { 'zuul':
