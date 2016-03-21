@@ -16,7 +16,7 @@
 # == Class: zuul::merger
 #
 class zuul::merger (
-  $ensure = undef,
+  $ensure          = undef,
   $manage_log_conf = true,
 ) {
   service { 'zuul-merger':
