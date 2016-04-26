@@ -154,7 +154,7 @@ describe 'puppet-zuul module', :if => ['debian', 'ubuntu'].include?(os[:family])
   end
 
   describe cron do
-    it { should have_entry('7 4 * * * find /var/lib/zuul/git/ -maxdepth 3 -type d -name ".git" -exec git --git-dir="{}" pack-refs --all \\\;').with_user('zuul') }
+    it { should have_entry('7 4 * * * find /var/lib/zuul/git/ -maxdepth 3 -type d -name ".git" -exec git --git-dir="{}" pack-refs --all \;').with_user('zuul') }
   end
 
   describe 'required services' do
