@@ -53,6 +53,10 @@ class zuul (
   $proxy_ssl_key_file_contents = '',
   $proxy_ssl_chain_file_contents = '',
   $block_referers = [],
+  # Launcher config
+  $jenkins_jobs = '',
+  $workspace_root = '',
+  $sites = [],
 ) {
   include ::httpd
   include ::pip
