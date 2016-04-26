@@ -57,3 +57,20 @@ port=<%= @smtp_port %>
 default_from=<%= @smtp_default_from %>
 default_to=<%= @smtp_default_to %>
 <% end -%>
+
+<% if @jenkins_jobs != "" -%>
+[launcher]
+jenkins_jobs=<%= @jenkins_jobs %>
+workspace_root=<%= @workspace_root %>
+<% end -%>
+
+<% @sites.each do |site| -%>
+[site "<%= site['name'] %>"]
+host=<%= site['host'] %>
+<% if site['user'] != "" -%>
+user="<%= site['user'] %>"
+<% end -%>
+<% if commentlink['pass'] != "" -%>
+pass="<%= site['pass'] %>"
+<% end -%>
+<% end -%>
