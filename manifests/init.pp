@@ -26,6 +26,7 @@ class zuul (
   $gerrit_user = '',
   $gerrit_baseurl = '',
   $zuul_ssh_private_key = '',
+  $layout_file_name = 'layout.yaml',
   $url_pattern = '',
   $status_url = "https://${::fqdn}/",
   $zuul_url = '',
