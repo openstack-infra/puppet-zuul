@@ -1,0 +1,11 @@
+Code-Review+2: Joshua Hesketh <joshua.hesketh@rackspace.com>
+Code-Review+1: Alon Marx <alonma@il.ibm.com>
+Code-Review+1: Mikhail S Medvedev <mihailmed@gmail.com>
+Code-Review+2: yolanda.robla <yolanda.robla-mota@hpe.com>
+Workflow+1: yolanda.robla <yolanda.robla-mota@hpe.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Thu, 12 May 2016 08:52:10 +0000
+Reviewed-on: https://review.openstack.org/314921
+Project: openstack-infra/puppet-zuul
+Branch: refs/heads/master
