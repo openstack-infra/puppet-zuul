@@ -56,6 +56,8 @@ class zuul (
   # Launcher config
   $jenkins_jobs = '',
   $workspace_root = '',
+  $worker_private_key_file = '',
+  $worker_username = '',
   $sites = [],
 ) {
   include ::httpd

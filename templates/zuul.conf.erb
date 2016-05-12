@@ -62,6 +62,12 @@ default_to=<%= @smtp_default_to %>
 [launcher]
 jenkins_jobs=<%= @jenkins_jobs %>
 workspace_root=<%= @workspace_root %>
+<% if @worker_private_key_file != "" -%>
+private_key_file=<%= @worker_private_key_file %>
+<% end -%>
+<% if @worker_username != "" -%>
+username=<%= @worker_username %>
+<% end -%>
 <% end -%>
 
 <% @sites.each do |site| -%>
