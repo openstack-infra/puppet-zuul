@@ -35,6 +35,24 @@ class zuul::launcher (
     }
   }
 
+  package { 'pyzmq':
+    ensure   => present,
+    provider => pip,
+    require  => Class['pip'],
+  }
+
+  package { 'jenkins-job-builder':
+    ensure   => present,
+    provider => pip,
+    require  => Class['pip'],
+  }
+
+  package { 'ansible':
+    ensure   => present,
+    provider => pip,
+    require  => Class['pip'],
+  }
+
   include ::logrotate
   ::logrotate::file { 'launcher.log':
     log     => '/var/log/zuul/launcher.log',
