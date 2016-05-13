@@ -54,6 +54,10 @@ class zuul (
   $proxy_ssl_key_file_contents = '',
   $proxy_ssl_chain_file_contents = '',
   $block_referers = [],
+  # Launcher config
+  $jenkins_jobs = '',
+  $workspace_root = '',
+  $sites = [],
 ) {
   include ::httpd
   include ::pip
@@ -345,6 +349,14 @@ class zuul (
     group  => 'root',
     mode   => '0555',
     source => 'puppet:///modules/zuul/zuul-merger.init',
+  }
+
+  file { '/etc/init.d/zuul-launcher':
+    ensure => present,
+    owner  => 'root',
+    group  => 'root',
+    mode   => '0555',
+    source => 'puppet:///modules/zuul/zuul-launcher.init',
   }
 
   if $proxy_ssl_cert_file_contents == '' {
