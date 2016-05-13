@@ -9,6 +9,7 @@ class { '::zuul::server':
 }
 
 class { '::zuul::merger': }
+class { '::zuul::launcher': }
 class { '::zuul::known_hosts':
   known_hosts_content => 'known_hosts_content',
 }
