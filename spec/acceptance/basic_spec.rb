@@ -49,7 +49,7 @@ describe 'puppet-zuul module', :if => ['debian', 'ubuntu'].include?(os[:family])
   describe 'required operating system packages' do
     packages = [
       package('git'),
-      package('gcc'),
+      package('build-essential'),
       package('python-lxml'),
       package('python-yaml'),
       package('python-paramiko'),

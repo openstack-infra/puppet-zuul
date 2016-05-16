@@ -65,7 +65,7 @@ class zuul (
   include ::pip
 
   $packages = [
-    'gcc',  # yappi requires this to build
+    'build-essential',  # yappi, pyzmq requires this to build
     'python-paste',
     'python-webob',
   ]
@@ -141,7 +141,7 @@ class zuul (
     subscribe   => Vcsrepo['/opt/zuul'],
     require     => [
       Class['pip'],
-      Package['gcc'],
+      Package['build-essential'],
       Package['python-daemon'],
       Package['python-lxml'],
       Package['python-paramiko'],
