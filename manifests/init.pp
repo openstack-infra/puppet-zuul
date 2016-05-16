@@ -65,7 +65,7 @@ class zuul (
   include ::pip
 
   $packages = [
-    'gcc',  # yappi requires this to build
+    'build-essential',  # yappi, pyzmq requires this to build
     'python-paste',
     'python-webob',
   ]
