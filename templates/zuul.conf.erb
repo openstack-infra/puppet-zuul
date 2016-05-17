@@ -75,12 +75,13 @@ username=<%= @worker_username %>
 [site "<%= site['name'] %>"]
 host=<%= site['host'] %>
 <% if site['user'] != "" -%>
-user="<%= site['user'] %>"
+user=<%= site['user'] %>
 <% end -%>
 <% if site['pass'] != "" -%>
-pass="<%= site['pass'] %>"
+pass=<%= site['pass'] %>
 <% end -%>
 <% if site['root'] != "" -%>
-root="<%= site['root'] %>"
+root=<%= site['root'] %>
 <% end -%>
+
 <% end -%>
