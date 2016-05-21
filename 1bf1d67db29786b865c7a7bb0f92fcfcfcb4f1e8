@@ -1,0 +1,9 @@
+Code-Review+2: Colleen Murphy <colleen@gazlene.net>
+Code-Review+2: yolanda.robla <yolanda.robla-mota@hpe.com>
+Workflow+1: yolanda.robla <yolanda.robla-mota@hpe.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Sat, 21 May 2016 07:57:50 +0000
+Reviewed-on: https://review.openstack.org/317617
+Project: openstack-infra/puppet-zuul
+Branch: refs/heads/master
