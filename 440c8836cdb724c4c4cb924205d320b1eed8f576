@@ -1,0 +1,9 @@
+Code-Review+2: Joshua Hesketh <joshua.hesketh@rackspace.com>
+Code-Review+2: Colleen Murphy <colleen@gazlene.net>
+Workflow+1: Colleen Murphy <colleen@gazlene.net>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Sat, 21 May 2016 07:54:03 +0000
+Reviewed-on: https://review.openstack.org/317090
+Project: openstack-infra/puppet-zuul
+Branch: refs/heads/master
