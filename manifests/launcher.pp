@@ -28,6 +28,12 @@ class zuul::launcher (
     require    => File['/etc/init.d/zuul-launcher'],
   }
 
+  exec { 'zuul-launcher-reload':
+    command     => '/etc/init.d/zuul-launcher reload',
+    require     => File['/etc/init.d/zuul-launcher'],
+    refreshonly => true,
+  }
+
   if $manage_log_conf {
     file { '/etc/zuul/launcher-logging.conf':
       ensure => present,
