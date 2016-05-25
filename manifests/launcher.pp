@@ -19,6 +19,7 @@
 class zuul::launcher (
   $ensure = undef,
   $manage_log_conf = true,
+  $project_config_repo = undef,
 ) {
   service { 'zuul-launcher':
     ensure     => $ensure,
@@ -26,6 +27,15 @@ class zuul::launcher (
     enable     => true,
     hasrestart => true,
     require    => File['/etc/init.d/zuul-launcher'],
+  }
+
+  if $project_config_repo != undef {
+    exec { 'zuul-launcher-reload':
+      command     => '/etc/init.d/zuul-launcher reload',
+      require     => File['/etc/init.d/zuul-launcher'],
+      refreshonly => true,
+      subscribe   => $project_config_repo,
+    }
   }
 
   if $manage_log_conf {
