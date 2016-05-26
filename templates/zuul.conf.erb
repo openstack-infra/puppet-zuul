@@ -85,3 +85,15 @@ root=<%= site['root'] %>
 <% end -%>
 
 <% end -%>
+
+<% @nodes.each do |node| -%>
+[node "<%= node['name'] %>"]
+host=<%= node['host'] %>
+<% if node['description'] != "" -%>
+description=<%= node['description'] %>
+<% end -%>
+<% if node['labels'] != "" -%>
+labels=<%= node['labels'] %>
+<% end -%>
+
+<% end -%>

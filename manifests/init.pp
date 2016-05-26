@@ -60,6 +60,7 @@ class zuul (
   $worker_private_key_file = '',
   $worker_username = '',
   $sites = [],
+  $nodes = [],
 ) {
   include ::httpd
   include ::pip
