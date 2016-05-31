@@ -82,13 +82,7 @@ do_stop()
 # Function that sends a SIGHUP to the daemon/service
 #
 do_reload() {
-    #
-    # If the daemon can reload its configuration without
-    # restarting (for example, when it is sent a SIGHUP),
-    # then implement that here.
-    #
-    start-stop-daemon \
-        --stop --signal 1 --quiet --pidfile $PIDFILE --name zuul-launcher
+    $DAEMON reconfigure
     return 0
 }
 
