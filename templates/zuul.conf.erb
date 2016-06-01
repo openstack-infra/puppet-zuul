@@ -63,7 +63,6 @@ default_to=<%= @smtp_default_to %>
 log_config=/etc/zuul/launcher-logging.conf
 jenkins_jobs=<%= @jenkins_jobs %>
 workspace_root=<%= @workspace_root %>
-socket=/var/lib/zuul/launcher.socket
 <% if @worker_private_key_file != "" -%>
 private_key_file=<%= @worker_private_key_file %>
 <% end -%>
