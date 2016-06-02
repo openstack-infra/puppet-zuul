@@ -66,13 +66,19 @@ class zuul (
   include ::pip
 
   $packages = [
-    'build-essential',  # yappi, pyzmq requires this to build
     'python-paste',
     'python-webob',
   ]
 
   package { $packages:
     ensure => present,
+  }
+
+  # yappi, pyzmq requires this to build
+  if ! defined(Package['build-essential']) {
+    package { 'build-essential':
+      ensure => present,
+    }
   }
 
   package { 'yappi':
