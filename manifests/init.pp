@@ -55,6 +55,7 @@ class zuul (
   $proxy_ssl_chain_file_contents = '',
   $block_referers = [],
   # Launcher config
+  $accept_nodes = '',
   $jenkins_jobs = '',
   $workspace_root = '',
   $worker_private_key_file = '',

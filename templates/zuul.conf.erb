@@ -69,6 +69,10 @@ private_key_file=<%= @worker_private_key_file %>
 <% if @worker_username != "" -%>
 username=<%= @worker_username %>
 <% end -%>
+<% if @accept_nodes != "" -%>
+accept-nodes=<%= @accept_nodes %>
+accept_nodes=<%= @accept_nodes %>
+<% end -%>
 <% end -%>
 
 <% @sites.each do |site| -%>
