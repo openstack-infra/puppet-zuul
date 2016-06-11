@@ -41,6 +41,10 @@ class zuul::launcher (
     }
   }
 
+  package { 'lftp':
+    ensure => present,
+  }
+
   package { 'pyzmq':
     ensure   => present,
     provider => pip,
