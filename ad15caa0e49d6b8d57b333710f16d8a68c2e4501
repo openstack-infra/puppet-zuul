@@ -1,0 +1,9 @@
+Code-Review+2: Jeremy Stanley <fungi@yuggoth.org>
+Workflow+1: Jeremy Stanley <fungi@yuggoth.org>
+Workflow+1: Paul Belanger <pabelanger@redhat.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Mon, 13 Jun 2016 20:05:14 +0000
+Reviewed-on: https://review.openstack.org/329127
+Project: openstack-infra/puppet-zuul
+Branch: refs/heads/master
