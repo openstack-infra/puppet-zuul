@@ -47,19 +47,19 @@ class zuul::launcher (
 
   package { 'pyzmq':
     ensure   => present,
-    provider => pip,
+    provider => openstack_pip,
     require  => Class['pip'],
   }
 
   package { 'jenkins-job-builder':
     ensure   => present,
-    provider => pip,
+    provider => openstack_pip,
     require  => Class['pip'],
   }
 
   package { 'ansible':
     ensure   => '2.1.0.0',
-    provider => pip,
+    provider => openstack_pip,
     require  => Class['pip'],
   }
 

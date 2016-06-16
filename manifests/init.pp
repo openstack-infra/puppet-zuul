@@ -85,7 +85,7 @@ class zuul (
 
   package { 'yappi':
     ensure   => present,
-    provider => pip,
+    provider => openstack_pip,
     require  => Class['pip'],
   }
 
