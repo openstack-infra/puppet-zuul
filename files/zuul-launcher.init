@@ -69,12 +69,13 @@ do_stop()
     $DAEMON stop
     return 0
 }
- 
+
 #
 # Function that sends a SIGHUP to the daemon/service
 #
 do_reload() {
-    $DAEMON reconfigure
+    start-stop-daemon \
+        --stop --signal 1 --quiet --pidfile $PIDFILE --name zuul-server
     return 0
 }
 
