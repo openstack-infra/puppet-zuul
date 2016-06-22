@@ -1,0 +1,8 @@
+Code-Review+2: Joshua Hesketh <joshua.hesketh@rackspace.com>
+Workflow+1: Joshua Hesketh <joshua.hesketh@rackspace.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Wed, 22 Jun 2016 06:59:06 +0000
+Reviewed-on: https://review.openstack.org/332583
+Project: openstack-infra/puppet-zuul
+Branch: refs/heads/master
