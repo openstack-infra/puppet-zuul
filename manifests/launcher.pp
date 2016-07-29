@@ -58,7 +58,7 @@ class zuul::launcher (
   }
 
   package { 'ansible':
-    ensure   => '2.1.0.0',
+    ensure   => '2.1.1.0',
     provider => openstack_pip,
     require  => Class['pip'],
   }
