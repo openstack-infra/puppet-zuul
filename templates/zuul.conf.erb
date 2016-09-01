@@ -4,36 +4,41 @@ check_job_registration=<%= @gearman_check_job_registration %>
 
 [gearman_server]
 start=<%= @internal_gearman %>
-log_config=/etc/zuul/gearman-logging.conf
+log_config=<%= @gearman_logconfig %>
 
 [gerrit]
 server=<%= @gerrit_server %>
 user=<%= @gerrit_user %>
-sshkey=/var/lib/zuul/ssh/id_rsa
-<% if @gerrit_baseurl != "" -%>
+<% if scope['ssh_private_key'] != :undef -%>
+sshkey=<%= @statedir + "/.ssh/id_rsa." + @gerrit_server %>
+<% end -%>
+<% if scope['gerrit_baseurl'] != :undef -%>
 baseurl=<%= @gerrit_baseurl %>
 <% end -%>
+no_http=<%= @no_http %>
 
 [zuul]
-layout_config=/etc/zuul/layout/<%= @layout_file_name %>
-log_config=/etc/zuul/logging.conf
-state_dir=/var/lib/zuul
+layout_config=<%= @layout %>
+log_config=<%= @zuul_logconfig %>
+state_dir=<%= @statedir %>
+<% if scope['url_pattern'] != :undef -%>
 url_pattern=<%= @url_pattern %>
+<% end -%>
 status_url=<%= @status_url %>
 job_name_in_report=<%= @job_name_in_report %>
 
 [merger]
-git_dir=/var/lib/zuul/git
+git_dir=<%= @statedir + "/git" %>
 zuul_url=<%= @zuul_url %>
-log_config=/etc/zuul/merger-logging.conf
-<% if @git_email != "" -%>
+log_config=<%= @merger_logconfig %>
+<% if scope['git_email'] != :undef -%>
 git_user_email=<%= @git_email %>
 <% end -%>
-<% if @git_name != "" -%>
+<% if scope['git_name'] != :undef -%>
 git_user_name=<%= @git_name %>
 <% end -%>
 
-<% if @swift_authurl != "" -%>
+<% if scope['swift_authurl'] != :undef -%>
 [swift]
 <% if @swift_account_temp_key != "" -%>
 X-Account-Meta-Temp-Url-Key=<%= @swift_account_temp_key %>
@@ -45,13 +50,12 @@ tenant_name=<%= @swift_tenant_name %>
 region_name=<%= @swift_region_name %>
 default_container=<%= @swift_default_container %>
 default_logserver_prefix=<%= @swift_default_logserver_prefix %>
-default_expiry=<%= @swift_default_expiry %>
-<% if @swift_auth_version != "" -%>
+<% if scope['swift_auth_version'] != :undef -%>
 auth_version=<%= @swift_auth_version %>
 <% end -%>
 <% end -%>
 
-<% if @smtp_host != "" -%>
+<% if scope['smtp_host'] != :undef -%>
 [smtp]
 server=<%= @smtp_host %>
 port=<%= @smtp_port %>

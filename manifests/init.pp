@@ -1,459 +1,382 @@
-# Copyright 2012-2013 Hewlett-Packard Development Company, L.P.
-# Copyright 2012 Antoine "hashar" Musso
-# Copyright 2012 Wikimedia Foundation Inc.
-# Copyright 2013 OpenStack Foundation
-#
-# Licensed under the Apache License, Version 2.0 (the "License"); you may
-# not use this file except in compliance with the License. You may obtain
-# a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-# License for the specific language governing permissions and limitations
-# under the License.
-
 # == Class: zuul
 #
+# This class deploys Zuul instance.
+#
+# === Parameters
+#
+# [*gerrit_user*]
+#   User name to use when logging into Gerrit server via ssh (required).
+#
+# [*gerrit_server*]
+#   FQDN of Gerrit server (required).
+#
+# [*known_hosts*]
+#   FQDN of servers to be added to known_hosts (required).
+#
+# [*dir*]
+#   Directory containing Zuul status files served via HTTP.
+#
+# [*dir_group*]
+#   Directory group.
+#
+# [*dir_owner*]
+#   Directory owner.
+#
+# [*export_merger_repos*]
+#   Wheither to configure Nginx to serve Merger Git repositories.
+#
+# [*gearman_logconfig*]
+#   Gearman logging configuration file.
+#
+# [*gearman_server*]
+#   Hostname or IP address of the Gearman server (127.0.0.1 by default).
+#
+# [*gerrit_port*]
+#   Optional: Gerrit server port (29418 by default).
+#
+# [*gerrit_baseurl*]
+#   Optional: path to Gerrit web interface.
+#   Defaults to https://<value of server>/.
+#
+# [*git_email*]
+#   Optional: Value to pass to git config user.email.
+#
+# [*git_name*]
+#   Optional: Value to pass to git config user.name.
+#
+# [*internal_gearman*]
+#   Whether to start the internal Gearman server (true by default).
+#
+# [*job_name_in_report*]
+#   Boolean value that indicates whether the job name should be included in the
+#   report (normally only the URL is included). Used by zuul-server only.
+#
+# [*layout*]
+#   Path to layout config file. Used by zuul-server only.
+#
+# [*logdir*]
+#   Path to logfiles.
+#
+# [*merger_logconfig*]
+#   Merger logging configuration file.
+#
+# [*nginx_access_log*]
+#   Access log file path.
+#
+# [*nginx_error_log*]
+#   Error log file path.
+#
+# [*nginx_log_format*]
+#   Log file format.
+#
+# [*no_http*]
+#   Don't use HTTP(S) for accessing Gerrit.
+#
+# [*packages*]
+#   Packages required to install instance.
+#
+# [*service_fqdn*]
+#   HTTP service FQDN.
+#
+# [*smtp_default_from*]
+#   Who the email should appear to be sent from when emailing the report.
+#
+# [*smtp_default_to*]
+#   Who the report should be emailed to by default.
+#
+# [*smtp_host*]
+#   SMTP server hostname or address to use.
+#
+# [*smtp_port*]
+#   Optional: SMTP server port.
+#
+# [*ssh_private_key*]
+#   Path to SSH key to use when logging into above server. If unset, will be
+#   used default (configured via ssh_config) SSH parameters.
+#
+# [*statedir*]
+#   Path to Zuul work (home) directory.
+#
+# [*status_url*]
+#   URL that will be posted in Zuul comments made to Gerrit changes when
+#   starting jobs for a change. Used by zuul-server only.
+#
+# [*swift_authurl*]
+#   The (keystone) Auth URL for swift.
+#
+# [*swift_auth_version*]
+#   OpenStack auth version, default is 1.0.
+#
+# [*swift_default_container*]
+#   Default Swift container.
+#
+# [*swift_default_logserver_prefix*]
+#   Prefix used for logging.
+#
+# [*swift_key*]
+#   Key/password to authenticate with.
+#
+# [*swift_region_name*]
+#   Region name.
+#
+# [*swift_tenant_name*]
+#   The tenant/account name, required when connecting to an auth 2.0 system.
+#
+# [*swift_user*]
+#   User name to authenticate as.
+#
+# [*url_pattern*]
+#   URL to externally stored logs. Used by zuul-server only.
+#
+# [*zuul_logconfig*]
+#   Zuul logging configuration file.
+#
+# [*zuul_url*]
+#   URL of this merger's git repos, accessible to test workers.
+#
+# === Examples
+#
+#  class { 'zuul':
+#    gerrit_user   => 'user',
+#    gerrit_server => 'review.example.com',
+#    known_hosts   => 'review.example.com',
+#  }
+#
+# === Authors
+#
+# Dmitry Kaigarodtsev <dkaiharodsev@mirantis.com>
+# Sergey Kulanov <skulanov@mirantis.com>
+# Pawel Brzozowski <pbrzozowski@mirantis.com>
+# Igor Shishkin <me@teran.ru>
+# Alexander Evseev <aevseev@mirantis.com>
+# Artur Kaszuba <akaszuba@mirantis.com>
+# Mateusz Matuszkowiak <mmatuszkowiak@mirantis.com>
+#
+# === Copyright
+#
+# Copyright 2016 Mirantis, Inc.
+#
 class zuul (
-  $vhost_name = $::fqdn,
-  $serveradmin = "webmaster@${::fqdn}",
-  $gearman_server = '127.0.0.1',
-  $gearman_check_job_registration = true,
-  $internal_gearman = true,
-  $gerrit_server = '',
-  $gerrit_user = '',
-  $gerrit_baseurl = '',
-  $zuul_ssh_private_key = '',
-  $layout_file_name = 'layout.yaml',
-  $url_pattern = '',
-  $status_url = "https://${::fqdn}/",
-  $zuul_url = '',
-  $git_source_repo = 'https://git.openstack.org/openstack-infra/zuul',
-  $job_name_in_report = false,
-  $revision = 'master',
-  $statsd_host = '',
-  $git_email = '',
-  $git_name = '',
-  $smtp_host = 'localhost',
-  $smtp_port = 25,
-  $smtp_default_from = "zuul@${::fqdn}",
-  $smtp_default_to = "zuul.reports@${::fqdn}",
-  $swift_account_temp_key = '',
-  $swift_authurl = '',
-  $swift_auth_version = '',
-  $swift_user = '',
-  $swift_key = '',
-  $swift_tenant_name = '',
-  $swift_region_name = '',
-  $swift_default_container = '',
-  $swift_default_logserver_prefix = '',
-  $swift_default_expiry = 7200,
-  $proxy_ssl_cert_file_contents = '',
-  $proxy_ssl_key_file_contents = '',
-  $proxy_ssl_chain_file_contents = '',
-  $block_referers = [],
-  # Launcher config
-  $accept_nodes = '',
-  $jenkins_jobs = '',
-  $workspace_root = '',
-  $worker_private_key_file = '',
-  $worker_username = '',
-  $sites = [],
-  $nodes = [],
+  $gerrit_user,
+  $gerrit_server,
+  $known_hosts,
+  $dir                            = '/usr/share/zuul/public_html',
+  $dir_group                      = 'www-data',
+  $dir_owner                      = 'www-data',
+  $export_merger_repos            = false,
+  $gearman_logconfig              = '/etc/zuul/gearman-logging.conf',
+  $gearman_server                 = '127.0.0.1',
+  $gerrit_port                    = '29418',
+  $gerrit_baseurl                 = undef,
+  $git_email                      = undef,
+  $git_name                       = undef,
+  $internal_gearman               = true,
+  $job_name_in_report             = false,
+  $layout                         = '/etc/zuul/layout.yaml',
+  $logdir                         = '/var/log/zuul',
+  $merger_logconfig               = '/etc/zuul/merger-logging.conf',
+  $nginx_access_log               = '/var/log/nginx/access.log',
+  $nginx_error_log                = '/var/log/nginx/error.log',
+  $nginx_log_format               = undef,
+  $no_http                        = false,
+  $packages                       = [
+    'nginx',
+    'zuul',
+  ],
+  $service_fqdn                   = 'zuul.local',
+  $smtp_default_from              = "zuul@${::fqdn}",
+  $smtp_default_to                = "zuul.reports@${::fqdn}",
+  $smtp_host                      = undef,
+  $smtp_port                      = 25,
+  $ssh_private_key                = undef,
+  $statedir                       = '/var/lib/zuul',
+  $status_url                     = "http://${::fqdn}/",
+  $swift_authurl                  = undef,
+  $swift_auth_version             = undef,
+  $swift_default_container        = 'default',
+  $swift_default_logserver_prefix = 'logserver_prefix',
+  $swift_key                      = 'swift_password',
+  $swift_region_name              = 'some_region',
+  $swift_tenant_name              = 'some_tenant',
+  $swift_user                     = 'swift_user',
+  $url_pattern                    = undef,
+  $zuul_logconfig                 = '/etc/zuul/zuul-logging.conf',
+  $zuul_url                       = "http://${::fqdn}/p",
 ) {
-  include ::httpd
-  include ::pip
 
-  $packages = [
-    'python-paste',
-    'python-webob',
-  ]
+  ensure_resource('user', $dir_owner, {
+    ensure => 'present',
+  })
 
-  package { $packages:
-    ensure => present,
-  }
+  ensure_resource('group', $dir_group, {
+    ensure => 'present',
+  })
 
-  # yappi, pyzmq requires this to build
-  if ! defined(Package['build-essential']) {
-    package { 'build-essential':
-      ensure => present,
-    }
-  }
+  ensure_packages($packages)
 
-  package { 'yappi':
-    ensure   => present,
-    provider => openstack_pip,
-    require  => Class['pip'],
-  }
-
-  # needed by python-keystoneclient, has system bindings
-  # Zuul and Nodepool both need it, so make it conditional
-  if ! defined(Package['python-lxml']) {
-    package { 'python-lxml':
-      ensure => present,
-    }
-  }
-
-  # A lot of things need yaml, be conservative requiring this package to avoid
-  # conflicts with other modules.
-  if ! defined(Package['python-yaml']) {
-    package { 'python-yaml':
-      ensure => present,
-    }
-  }
-
-  if ! defined(Package['python-paramiko']) {
-    package { 'python-paramiko':
-      ensure   => present,
-    }
-  }
-
-  if ! defined(Package['python-daemon']) {
-    package { 'python-daemon':
-      ensure => present,
-    }
-  }
-
-  if ! defined(Package['yui-compressor']) {
-    package { 'yui-compressor':
-      ensure => present,
-    }
-  }
-
-  user { 'zuul':
-    ensure     => present,
-    home       => '/home/zuul',
-    shell      => '/bin/bash',
-    gid        => 'zuul',
-    managehome => true,
-    require    => Group['zuul'],
-  }
-
-  group { 'zuul':
-    ensure => present,
-  }
-
-  vcsrepo { '/opt/zuul':
-    ensure   => latest,
-    provider => git,
-    revision => $revision,
-    source   => $git_source_repo,
-  }
-
-  exec { 'install_zuul' :
-    command     => 'pip install -U /opt/zuul',
-    path        => '/usr/local/bin:/usr/bin:/bin/',
-    refreshonly => true,
-    subscribe   => Vcsrepo['/opt/zuul'],
-    require     => [
-      Class['pip'],
-      Package['build-essential'],
-      Package['python-daemon'],
-      Package['python-lxml'],
-      Package['python-paramiko'],
-      Package['python-paste'],
-      Package['python-webob'],
-      Package['python-yaml'],
-      Package['yappi'],
-      Package['yui-compressor'],
-    ],
-  }
-
-  file { '/etc/zuul':
-    ensure => directory,
-  }
-
-# TODO: We should put in  notify either Service['zuul'] or Exec['zuul-reload']
-#       at some point, but that still has some problems.
   file { '/etc/zuul/zuul.conf':
-    ensure  => present,
-    owner   => 'zuul',
-    mode    => '0400',
     content => template('zuul/zuul.conf.erb'),
+    require => Package[ $packages ],
+  }
+
+  file { $logdir:
+    ensure  => directory,
+    owner   => 'zuul',
+    group   => 'zuul',
+    mode    => '0755',
+    require => Package[ $packages ],
+  }
+
+  file { $gearman_logconfig:
+    content => template('zuul/gearman-logging.conf.erb'),
     require => [
-      File['/etc/zuul'],
-      User['zuul'],
+      Package[ $packages ],
+      File[ $logdir ],
     ],
   }
 
-  file { '/etc/default/zuul':
-    ensure  => present,
-    mode    => '0444',
-    content => template('zuul/zuul.default.erb'),
+  file { $merger_logconfig:
+    content => template('zuul/merger-logging.conf.erb'),
+    require => [
+      Package[ $packages ],
+      File[ $logdir ],
+    ],
   }
 
-  file { '/var/log/zuul':
-    ensure  => directory,
-    owner   => 'zuul',
-    require => User['zuul'],
+  file { $zuul_logconfig:
+    content => template('zuul/zuul-logging.conf.erb'),
+    require => [
+      Package[ $packages ],
+      File[ $logdir ],
+    ],
   }
 
-  file { '/var/run/zuul':
-    ensure  => directory,
-    owner   => 'zuul',
-    group   => 'zuul',
-    require => User['zuul'],
-  }
-
-  file { '/var/run/zuul-merger':
+  file { $statedir:
     ensure  => directory,
     owner   => 'zuul',
     group   => 'zuul',
-    require => User['zuul'],
+    mode    => '0755',
+    require => Package[ $packages ],
   }
 
-  file { '/var/lib/zuul':
-    ensure => directory,
-    owner  => 'zuul',
-    group  => 'zuul',
-  }
+  # Prepare SSH connection
+  if ( $ssh_private_key ) {
 
-  file { '/var/lib/zuul/git':
-    ensure  => directory,
-    owner   => 'zuul',
-    require => File['/var/lib/zuul'],
-  }
-
-  file { '/var/lib/zuul/ssh':
-    ensure  => directory,
-    owner   => 'zuul',
-    group   => 'zuul',
-    mode    => '0500',
-    require => File['/var/lib/zuul'],
-  }
-
-  file { '/var/lib/zuul/ssh/id_rsa':
-    owner   => 'zuul',
-    group   => 'zuul',
-    mode    => '0400',
-    require => File['/var/lib/zuul/ssh'],
-    content => $zuul_ssh_private_key,
-  }
-
-  file { '/var/lib/zuul/www':
-    ensure  => directory,
-    require => File['/var/lib/zuul'],
-  }
-
-  file { '/var/lib/zuul/www/lib':
-    ensure  => directory,
-    require => File['/var/lib/zuul/www'],
-  }
-
-  package { 'libjs-jquery':
-    ensure => present,
-  }
-
-  file { '/var/lib/zuul/www/jquery.min.js':
-    ensure => absent
-  }
-
-  file { '/var/lib/zuul/www/lib/jquery.min.js':
-    ensure  => link,
-    target  => '/usr/share/javascript/jquery/jquery.min.js',
-    require => [File['/var/lib/zuul/www/lib'],
-                Package['libjs-jquery']],
-  }
-
-  vcsrepo { '/opt/twitter-bootstrap':
-    ensure   => latest,
-    provider => git,
-    revision => 'v3.1.1',
-    source   => 'https://github.com/twbs/bootstrap.git',
-  }
-
-  file { '/var/lib/zuul/www/bootstrap':
-    ensure => absent
-  }
-
-  file { '/var/lib/zuul/www/lib/bootstrap':
-    ensure  => link,
-    target  => '/opt/twitter-bootstrap/dist',
-    require => [File['/var/lib/zuul/www/lib'],
-                Package['libjs-jquery'],
-                Vcsrepo['/opt/twitter-bootstrap']],
-  }
-
-  vcsrepo { '/opt/jquery-visibility':
-    ensure   => latest,
-    provider => git,
-    revision => 'master',
-    source   => 'https://github.com/mathiasbynens/jquery-visibility.git',
-  }
-
-  file { '/var/lib/zuul/www/jquery-visibility.min.js':
-    ensure => absent
-  }
-
-  exec { 'install-jquery-visibility':
-    command     => 'yui-compressor -o /var/lib/zuul/www/lib/jquery-visibility.js /opt/jquery-visibility/jquery-visibility.js',
-    path        => 'bin:/usr/bin',
-    refreshonly => true,
-    subscribe   => Vcsrepo['/opt/jquery-visibility'],
-    require     => [File['/var/lib/zuul/www/lib'],
-                    Package['yui-compressor'],
-                    Vcsrepo['/opt/jquery-visibility']],
-  }
-
-  vcsrepo { '/opt/graphitejs':
-    ensure   => latest,
-    provider => git,
-    revision => 'master',
-    source   => 'https://github.com/prestontimmons/graphitejs.git',
-  }
-
-  file { '/var/lib/zuul/www/jquery.graphite.js':
-    ensure => absent
-  }
-
-  file { '/var/lib/zuul/www/lib/jquery.graphite.js':
-    ensure  => link,
-    target  => '/opt/graphitejs/jquery.graphite.js',
-    require => [File['/var/lib/zuul/www/lib'],
-                Vcsrepo['/opt/graphitejs']],
-  }
-
-  file { '/var/lib/zuul/www/index.html':
-    ensure  => link,
-    target  => '/opt/zuul/etc/status/public_html/index.html',
-    require => File['/var/lib/zuul/www'],
-  }
-
-  file { '/var/lib/zuul/www/styles':
-    ensure  => link,
-    target  => '/opt/zuul/etc/status/public_html/styles',
-    require => File['/var/lib/zuul/www'],
-  }
-
-  file { '/var/lib/zuul/www/zuul.app.js':
-    ensure  => link,
-    target  => '/opt/zuul/etc/status/public_html/zuul.app.js',
-    require => File['/var/lib/zuul/www'],
-  }
-
-  file { '/var/lib/zuul/www/jquery.zuul.js':
-    ensure  => link,
-    target  => '/opt/zuul/etc/status/public_html/jquery.zuul.js',
-    require => File['/var/lib/zuul/www'],
-  }
-
-  file { '/var/lib/zuul/www/images':
-    ensure  => link,
-    target  => '/opt/zuul/etc/status/public_html/images',
-    require => File['/var/lib/zuul/www'],
-  }
-
-  file { '/etc/init.d/zuul':
-    ensure => present,
-    owner  => 'root',
-    group  => 'root',
-    mode   => '0555',
-    source => 'puppet:///modules/zuul/zuul.init',
-  }
-
-  file { '/etc/init.d/zuul-merger':
-    ensure => present,
-    owner  => 'root',
-    group  => 'root',
-    mode   => '0555',
-    source => 'puppet:///modules/zuul/zuul-merger.init',
-  }
-
-  file { '/etc/init.d/zuul-launcher':
-    ensure => present,
-    owner  => 'root',
-    group  => 'root',
-    mode   => '0555',
-    source => 'puppet:///modules/zuul/zuul-launcher.init',
-  }
-
-  if $proxy_ssl_cert_file_contents == '' {
-    $ssl = false
-  } else {
-    $ssl = true
-    file { '/etc/ssl/certs':
-      ensure => directory,
-      owner  => 'root',
-      group  => 'root',
-      mode   => '0755',
+    file { "${statedir}/.ssh":
+      ensure  => directory,
+      owner   => 'zuul',
+      group   => 'zuul',
+      mode    => '0700',
+      require => File[ $statedir ],
     }
-    file { '/etc/ssl/private':
-      ensure => directory,
-      owner  => 'root',
-      group  => 'root',
-      mode   => '0700',
+
+    file { "${statedir}/.ssh/id_rsa.${gerrit_server}":
+      owner   => 'zuul',
+      group   => 'zuul',
+      mode    => '0400',
+      content => $ssh_private_key,
+      require => File[ "${statedir}/.ssh" ],
     }
-    file { "/etc/ssl/certs/${vhost_name}.pem":
-      ensure  => present,
-      owner   => 'root',
-      group   => 'root',
-      mode    => '0644',
-      content => $proxy_ssl_cert_file_contents,
-      require => File['/etc/ssl/certs'],
-      before  => Httpd::Vhost[$vhost_name],
+
+    file { "${statedir}/.ssh/config":
+      owner   => 'zuul',
+      group   => 'zuul',
+      content => template('zuul/ssh_config.erb'),
+      require => File[ "${statedir}/.ssh", "${statedir}/.ssh/id_rsa.${gerrit_server}" ],
     }
-    file { "/etc/ssl/private/${vhost_name}.key":
-      ensure  => present,
-      owner   => 'root',
-      group   => 'root',
-      mode    => '0600',
-      content => $proxy_ssl_key_file_contents,
-      require => File['/etc/ssl/private'],
-      before  => Httpd::Vhost[$vhost_name],
-    }
-    if $proxy_ssl_chain_file_contents != '' {
-      file { "/etc/ssl/certs/${vhost_name}_intermediate.pem":
-        ensure  => present,
-        owner   => 'root',
-        group   => 'root',
-        mode    => '0644',
-        content => $proxy_ssl_chain_file_contents,
-        require => File['/etc/ssl/certs'],
-        before  => Httpd::Vhost[$vhost_name],
-      }
-    }
+
+    create_resources('ssh::known_host', $known_hosts, {
+      user    => 'zuul',
+      require => File[ "${statedir}/.ssh" ],
+    })
+
   }
 
-  ::httpd::vhost { $vhost_name:
-    port       => 443, # Is required despite not being used.
-    docroot    => 'MEANINGLESS ARGUMENT',
-    priority   => '50',
-    ssl        => $ssl,
-    template   => 'zuul/zuul.vhost.erb',
-    vhost_name => $vhost_name,
-  }
-  if ! defined(Httpd::Mod['rewrite']) {
-    httpd::mod { 'rewrite': ensure => present }
-  }
-  if ! defined(Httpd::Mod['proxy']) {
-    httpd::mod { 'proxy': ensure => present }
-  }
-  if ! defined(Httpd::Mod['proxy_http']) {
-    httpd::mod { 'proxy_http': ensure => present }
-  }
-  if ! defined(Httpd::Mod['cache']) {
-    httpd::mod { 'cache': ensure => present }
-  }
-  if ! defined(Httpd::Mod['cgid']) {
-    httpd::mod { 'cgid': ensure => present }
+  file { $dir :
+    ensure  => 'directory',
+    owner   => $dir_owner,
+    group   => $dir_group,
+    mode    => '0755',
+    require => [
+        Class['nginx'],
+        User[$dir_owner],
+        Group[$dir_group],
+      ],
   }
 
-  case $::lsbdistcodename {
-    'precise': {
-      if ! defined(Httpd::Mod['mem_cache']) {
-        httpd::mod { 'mem_cache': ensure => present }
-      }
-      if ! defined(Httpd::Mod['version']) {
-        httpd::mod { 'version': ensure => present }
-      }
+  include ::nginx
+
+  # zuul configuration for nginx adopted from
+  # https://github.com/openstack-infra/puppet-zuul/blob/master/templates/zuul.vhost.erb
+  ::nginx::resource::vhost { 'zuul' :
+    ensure      => 'present',
+    www_root    => $dir,
+    access_log  => $nginx_access_log,
+    error_log   => $nginx_error_log,
+    format_log  => $nginx_log_format,
+    server_name => [
+      $service_fqdn,
+      "zuul.${::fqdn}",
+    ],
+  }
+
+  ::nginx::resource::location { 'status.json' :
+    ensure   => 'present',
+    location => '/status.json',
+    vhost    => 'zuul',
+    proxy    => 'http://127.0.0.1:8001/status.json',
+  }
+
+  # Correctly use matching for zuul status targeted pass through so that
+  # we can get the optimized per change zuul results.
+  ::nginx::resource::location { 'status' :
+    ensure   => 'present',
+    location => '~ ^/status/(.*)',
+    vhost    => 'zuul',
+    proxy    => 'http://127.0.0.1:8001/status/$1',
+  }
+
+  # To serve merger's Git repositories it's needed to use CGI program
+  # "git-http-backend" but Nginx can't be used with CGI directly.
+  if ( $export_merger_repos ) {
+
+    package{ 'fcgiwrap': ensure => present }
+
+    $git_home = $osfamily ? {
+      'Debian' => '/usr/lib/git-core',
+      'RedHat' => '/usr/libexec/git-core',
+      'Suse'   => '/usr/lib/git',
     }
-    default: {
-      if ! defined(Httpd::Mod['cache_disk']) {
-        httpd::mod { 'cache_disk': ensure => present }
-      }
+
+    ::nginx::resource::location{ 'git-repos':
+      ensure                 => present,
+      location               => '~ ^/p(/.*)',
+      vhost                  => 'zuul',
+      fastcgi                => 'unix:/run/fcgiwrap.socket',
+      fastcgi_param          => {
+        'DOCUMENT_ROOT'       => $git_home,
+        'GIT_HTTP_EXPORT_ALL' => '""',
+        'GIT_PROJECT_ROOT'    => "${statedir}/git/",
+        'PATH_INFO'           => '$1',
+        'SCRIPT_FILENAME'     => "${git_home}/git-http-backend",
+        'CONTENT_LENGTH'      => '$content_length',
+        'CONTENT_TYPE'        => '$content_type',
+        'DOCUMENT_URI'        => '$document_uri',
+        'GATEWAY_INTERFACE'   => 'CGI/1.1',
+        'HTTPS'               => '$https if_not_empty',
+        'QUERY_STRING'        => '$query_string',
+        'REMOTE_ADDR'         => '$remote_addr',
+        'REMOTE_PORT'         => '$remote_port',
+        'REQUEST_METHOD'      => '$request_method',
+        'REQUEST_URI'         => '$request_uri',
+        'SCRIPT_NAME'         => '$fastcgi_script_name',
+        'SERVER_ADDR'         => '$server_addr',
+        'SERVER_NAME'         => '$server_name',
+        'SERVER_PORT'         => '$server_port',
+        'SERVER_PROTOCOL'     => '$server_protocol',
+        'SERVER_SOFTWARE'     => 'nginx/$nginx_version',
+      },
+      fastcgi_params_include => false,
     }
   }
 

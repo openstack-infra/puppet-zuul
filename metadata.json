@@ -1,13 +1,12 @@
 {
-  "name": "openstackinfra-zuul",
+  "name": "puppet-zuul",
   "version": "0.0.1",
-  "author": "Openstack CI",
+  "author": "Mirantis CI Team",
   "summary": "Puppet module for Zuul",
   "license": "Apache 2.0",
-  "source": "git://git.openstack.org/openstack-infra/puppet-zuul.git",
-  "project_page": "http://docs.openstack.org/infra/system-config/",
-  "issues_url": "https://storyboard.openstack.org/#!/project/740",
+  "source": "ssh://review.fuel-infra.org:29418/fuel-infra/puppet-zuul",
+  "issues_url": "https://bugs.launchpad.net/fuel/",
   "dependencies": [
-    {"name":"openstackinfra/vcsrepo","version_requirement":">= 0.0.8"}
+    {"name":"puppetlabs-stdlib","version_requirement":">= 1.0.0"}
   ]
 }
