@@ -57,9 +57,10 @@ class zuul::launcher (
     require  => Class['pip'],
   }
 
-  package { 'ansible':
-    ensure   => '2.1.1.0',
-    provider => openstack_pip,
+  exec { 'install-ansible-rc':
+    command  => 'pip install https://releases.ansible.com/ansible/ansible-2.1.4.0-0.1.rc1.tar.gz',
+    unless   => 'pip freeze | grep \'ansible==2.1.4.0\'',
+    path     => '/usr/local/bin:/bin:/usr/bin',
     require  => Class['pip'],
   }
 
