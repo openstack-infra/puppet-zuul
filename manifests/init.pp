@@ -354,6 +354,14 @@ class zuul (
     source => 'puppet:///modules/zuul/zuul.init',
   }
 
+  file { '/etc/init.d/zuul-scheduler':
+    ensure => present,
+    owner  => 'root',
+    group  => 'root',
+    mode   => '0555',
+    source => 'puppet:///modules/zuul/zuul-scheduler.init',
+  }
+
   file { '/etc/init.d/zuul-merger':
     ensure => present,
     owner  => 'root',
