@@ -52,7 +52,7 @@ class zuul::launcher (
   }
 
   package { 'jenkins-job-builder':
-    ensure   => '1.6.1',
+    ensure   => '1.6.2',
     provider => openstack_pip,
     require  => Class['pip'],
   }
