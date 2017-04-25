@@ -63,6 +63,7 @@ class zuul (
   $worker_username = '',
   $sites = [],
   $nodes = [],
+  $connections = [],
 ) {
   include ::httpd
   include ::pip

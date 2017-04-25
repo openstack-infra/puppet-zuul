@@ -6,12 +6,14 @@ check_job_registration=<%= @gearman_check_job_registration %>
 start=<%= @internal_gearman %>
 log_config=/etc/zuul/gearman-logging.conf
 
+<% if @gerrit_server != "" -%>
 [gerrit]
 server=<%= @gerrit_server %>
 user=<%= @gerrit_user %>
 sshkey=/var/lib/zuul/ssh/id_rsa
 <% if @gerrit_baseurl != "" -%>
 baseurl=<%= @gerrit_baseurl %>
+<% end -%>
 <% end -%>
 
 [zuul]
@@ -73,6 +75,14 @@ username=<%= @worker_username %>
 <% if @accept_nodes != "" -%>
 accept_nodes=<%= @accept_nodes %>
 <% end -%>
+<% end -%>
+
+<% @connections.each do |connection| -%>
+[connection "<%= connection['name'] %>"]
+<% connection.each do |key,value| -%>
+<%= key %>=<%= value %>
+<% end -%>
+
 <% end -%>
 
 <% @sites.each do |site| -%>
