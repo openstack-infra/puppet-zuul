@@ -64,9 +64,17 @@ class zuul (
   $sites = [],
   $nodes = [],
   $connections = [],
+  $python_version = 2,
 ) {
   include ::httpd
   include ::pip
+
+  if ($python_version == 3) {
+    include ::pip:python3
+    $pip_command = 'python3 -m pip'
+  } else {
+    $pip_command = 'python -m pip'
+  }
 
   $packages = [
     'python-paste',
@@ -84,10 +92,12 @@ class zuul (
     }
   }
 
-  package { 'yappi':
-    ensure   => present,
-    provider => openstack_pip,
-    require  => Class['pip'],
+  if ($python_version == 2) {
+    package { 'yappi':
+      ensure   => present,
+      provider => $pip_provider,
+      require  => Class['pip'],
+    }
   }
 
   # needed by python-keystoneclient, has system bindings
@@ -145,7 +155,7 @@ class zuul (
   }
 
   exec { 'install_zuul' :
-    command     => 'pip install -U /opt/zuul',
+    command     => "${pip_command} install -U /opt/zuul",
     path        => '/usr/local/bin:/usr/bin:/bin/',
     refreshonly => true,
     subscribe   => Vcsrepo['/opt/zuul'],
