@@ -64,9 +64,19 @@ class zuul (
   $sites = [],
   $nodes = [],
   $connections = [],
+  $python_version = 2,
 ) {
   include ::httpd
   include ::pip
+
+  if ($python_version == 3) {
+    include ::pip::python3
+    $pip_provider = pip3
+    $pip_command = 'pip3'
+  } else {
+    $pip_provider = openstack_pip
+    $pip_command = 'pip'
+  }
 
   $packages = [
     'python-paste',
@@ -86,7 +96,7 @@ class zuul (
 
   package { 'yappi':
     ensure   => present,
-    provider => openstack_pip,
+    provider => $pip_provider,
     require  => Class['pip'],
   }
 
@@ -145,7 +155,7 @@ class zuul (
   }
 
   exec { 'install_zuul' :
-    command     => 'pip install -U /opt/zuul',
+    command     => "${pip_command} install -U /opt/zuul",
     path        => '/usr/local/bin:/usr/bin:/bin/',
     refreshonly => true,
     subscribe   => Vcsrepo['/opt/zuul'],
