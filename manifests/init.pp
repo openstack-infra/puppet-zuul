@@ -63,6 +63,7 @@ class zuul (
   $worker_username = '',
   $sites = [],
   $nodes = [],
+  $zuulv3 = false,
 ) {
   include ::httpd
   include ::pip
@@ -166,13 +167,19 @@ class zuul (
     ensure => directory,
   }
 
+  if $zuulv3 {
+    $zuul_conf_content = template('zuul/zuulv3.conf.erb')
+  } else {
+    $zuul_conf_content = template('zuul/zuul.conf.erb')
+  }
+
 # TODO: We should put in  notify either Service['zuul'] or Exec['zuul-reload']
 #       at some point, but that still has some problems.
   file { '/etc/zuul/zuul.conf':
     ensure  => present,
     owner   => 'zuul',
     mode    => '0400',
-    content => template('zuul/zuul.conf.erb'),
+    content => $zuul_conf_content,
     require => [
       File['/etc/zuul'],
       User['zuul'],
@@ -376,6 +383,14 @@ class zuul (
     group  => 'root',
     mode   => '0555',
     source => 'puppet:///modules/zuul/zuul-launcher.init',
+  }
+
+  file { '/etc/init.d/zuul-executor':
+    ensure => present,
+    owner  => 'root',
+    group  => 'root',
+    mode   => '0555',
+    source => 'puppet:///modules/zuul/zuul-executor.init',
   }
 
   if $proxy_ssl_cert_file_contents == '' {
