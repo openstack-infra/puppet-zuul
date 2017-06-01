@@ -402,6 +402,14 @@ class zuul (
     source => 'puppet:///modules/zuul/zuul-launcher.init',
   }
 
+  file { '/etc/init.d/zuul-executor':
+    ensure => present,
+    owner  => 'root',
+    group  => 'root',
+    mode   => '0555',
+    source => 'puppet:///modules/zuul/zuul-executor.init',
+  }
+
   if $proxy_ssl_cert_file_contents == '' {
     $ssl = false
   } else {
