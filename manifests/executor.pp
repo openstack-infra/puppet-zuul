@@ -31,6 +31,17 @@ class zuul::executor (
     ],
   }
 
+  if ($::operatingsystem == 'Ubuntu') and ($::operatingsystemrelease >= '16.04') {
+    # This is a hack to make sure that systemd is aware of the new service
+    # before we attempt to start it.
+    exec { 'zuul-executor-systemd-daemon-reload':
+      command     => '/bin/systemctl daemon-reload',
+      before      => Service['zuul-executor'],
+      subscribe   => File['/etc/init.d/zuul-executor'],
+      refreshonly => true,
+    }
+  }
+
   service { 'zuul-executor':
     ensure     => $ensure,
     name       => 'zuul-executor',
