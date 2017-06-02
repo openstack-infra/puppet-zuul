@@ -1,0 +1,41 @@
+[gearman]
+server=<%= @gearman_server %>
+check_job_registration=<%= @gearman_check_job_registration %>
+
+[gearman_server]
+start=<%= @internal_gearman %>
+log_config=/etc/zuul/gearman-logging.conf
+
+[zuul]
+tenant_config=/etc/zuul/layout/<%= @tenant_file_name %>
+log_config=/etc/zuul/logging.conf
+state_dir=/var/lib/zuul
+url_pattern=<%= @url_pattern %>
+status_url=<%= @status_url %>
+job_name_in_report=<%= @job_name_in_report %>
+zookeeper_hosts=<%= @zookeeper_hosts %>
+
+[merger]
+git_dir=/var/lib/zuul/git
+zuul_url=<%= @zuul_url %>
+log_config=/etc/zuul/merger-logging.conf
+<% if @git_email != "" -%>
+git_user_email=<%= @git_email %>
+<% end -%>
+<% if @git_name != "" -%>
+git_user_name=<%= @git_name %>
+<% end -%>
+
+[executor]
+log_config=/etc/zuul/launcher-logging.conf
+<% if @worker_private_key_file != "" -%>
+private_key_file=<%= @worker_private_key_file %>
+<% end -%>
+
+<% @connections.each do |connection| -%>
+[connection "<%= connection['name'] %>"]
+<% connection.each do |key,value| -%>
+<%= key %>=<%= value %>
+<% end -%>
+
+<% end -%>

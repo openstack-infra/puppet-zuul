@@ -28,6 +28,8 @@ class zuul (
   $gerrit_baseurl = '',
   $zuul_ssh_private_key = '',
   $layout_file_name = 'layout.yaml',
+  $zookeeper_hosts = '127.0.0.1:2181',
+  $tenant_file_name = 'main.yaml',
   $url_pattern = '',
   $status_url = "https://${::fqdn}/",
   $zuul_url = '',
@@ -65,6 +67,7 @@ class zuul (
   $nodes = [],
   $connections = [],
   $python_version = 2,
+  $zuulv3 = false,
 ) {
   include ::httpd
   include ::pip
@@ -181,13 +184,19 @@ class zuul (
     ensure => directory,
   }
 
+  if $zuulv3 {
+    $zuul_conf_content = template('zuul/zuulv3.conf.erb')
+  } else {
+    $zuul_conf_content = template('zuul/zuul.conf.erb')
+  }
+
 # TODO: We should put in  notify either Service['zuul'] or Exec['zuul-reload']
 #       at some point, but that still has some problems.
   file { '/etc/zuul/zuul.conf':
     ensure  => present,
     owner   => 'zuul',
     mode    => '0400',
-    content => template('zuul/zuul.conf.erb'),
+    content => $zuul_conf_content,
     require => [
       File['/etc/zuul'],
       User['zuul'],
