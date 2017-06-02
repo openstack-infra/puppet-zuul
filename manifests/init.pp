@@ -79,6 +79,8 @@ class zuul (
   }
 
   $packages = [
+    'libffi-dev',
+    'libssl-dev',
     'python-paste',
     'python-webob',
   ]
@@ -162,6 +164,8 @@ class zuul (
     require     => [
       Class['pip'],
       Package['build-essential'],
+      Package['libffi-dev'],
+      Package['libssl-dev'],
       Package['python-daemon'],
       Package['python-lxml'],
       Package['python-paramiko'],
