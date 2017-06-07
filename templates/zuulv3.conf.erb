@@ -27,7 +27,7 @@ git_user_name=<%= @git_name %>
 <% end -%>
 
 [executor]
-log_config=/etc/zuul/launcher-logging.conf
+log_config=/etc/zuul/executor-logging.conf
 <% if @worker_private_key_file != "" -%>
 private_key_file=<%= @worker_private_key_file %>
 <% end -%>
