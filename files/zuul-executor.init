@@ -18,7 +18,7 @@ NAME=zuul-executor
 DAEMON=/usr/local/bin/zuul-executor
 PIDFILE=/var/run/$NAME/$NAME.pid
 SCRIPTNAME=/etc/init.d/$NAME
-USER=zuul
+USER=root
 
 # Exit if the package is not installed
 [ -x "$DAEMON" ] || exit 0
