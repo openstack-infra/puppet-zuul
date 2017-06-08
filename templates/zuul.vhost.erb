@@ -33,8 +33,8 @@
   RewriteCond %{HTTP_REFERER} =<%= referer %>
   RewriteRule ^/status.json - [F]
   <% end -%>
-  RewriteRule ^/status.json$ http://127.0.0.1:8001/status.json [P]
-  RewriteRule ^/status/(.*) http://127.0.0.1:8001/status/$1 [P]
+  RewriteRule ^/status.json$ <%= @zuul_status_url %>/status.json [P]
+  RewriteRule ^/status/(.*) <%= @zuul_status_url %>/status/$1 [P]
 
   AddOutputFilterByType DEFLATE application/json
 
@@ -98,8 +98,8 @@
   RewriteCond %{HTTP_REFERER} =<%= referer %>
   RewriteRule ^/status.json - [F]
   <% end -%>
-  RewriteRule ^/status.json$ http://127.0.0.1:8001/status.json [P]
-  RewriteRule ^/status/(.*) http://127.0.0.1:8001/status/$1 [P]
+  RewriteRule ^/status.json$ <%= @zuul_status_url %>/status.json [P]
+  RewriteRule ^/status/(.*) <%= @zuul_status_url %>/status/$1 [P]
 
   AddOutputFilterByType DEFLATE application/json
 

@@ -32,6 +32,7 @@ class zuul (
   $tenant_file_name = 'main.yaml',
   $url_pattern = '',
   $status_url = "https://${::fqdn}/",
+  $zuul_status_url = 'http://127.0.0.1:8001',
   $zuul_url = '',
   $git_source_repo = 'https://git.openstack.org/openstack-infra/zuul',
   $job_name_in_report = false,
