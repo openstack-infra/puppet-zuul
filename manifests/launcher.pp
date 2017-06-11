@@ -25,6 +25,7 @@ class zuul::launcher (
     name       => 'zuul-launcher',
     enable     => true,
     hasrestart => true,
+    provider   => init,
     require    => File['/etc/init.d/zuul-launcher'],
   }
 
