@@ -36,6 +36,7 @@ class zuul::executor (
     name       => 'zuul-executor',
     enable     => true,
     hasrestart => true,
+    provider   => init,
     require    => File['/etc/init.d/zuul-executor'],
   }
 

@@ -24,6 +24,7 @@ class zuul::scheduler (
     ensure     => $ensure,
     enable     => true,
     hasrestart => true,
+    provider   => init,
     require    => File['/etc/init.d/zuul-scheduler'],
   }
 
