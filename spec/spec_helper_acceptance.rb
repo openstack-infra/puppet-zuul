@@ -2,7 +2,14 @@ require 'beaker-rspec'
 
 hosts.each do |host|
 
-  install_puppet
+  # puppet 3 isn't available from apt.puppetlabs.com so install it from the Xenial repos
+  on host, "which apt-get && apt-get install puppet -y", { :acceptable_exit_codes => [0,1] }
+  # otherwise use the beaker helpers to install the yum.puppetlabs.com repo and puppet
+  r = on host, "which yum",  { :acceptable_exit_codes => [0,1] }
+  if r.exit_code == 0
+    install_puppet
+  end
+  add_platform_foss_defaults(host, 'unix')
 
   on host, "mkdir -p #{host['distmoduledir']}"
 end
