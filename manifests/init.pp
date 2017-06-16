@@ -69,6 +69,11 @@ class zuul (
   $connections = [],
   $python_version = 2,
   $zuulv3 = false,
+  $gearman_client_ssl_cert = undef,
+  $gearman_client_ssl_key = undef,
+  $gearman_server_ssl_cert = undef,
+  $gearman_server_ssl_key = undef,
+  $gearman_ssl_ca = undef,
 ) {
   include ::httpd
   include ::pip
@@ -182,7 +187,74 @@ class zuul (
   }
 
   file { '/etc/zuul':
+    ensure  => directory,
+    group   => 'zuul',
+    mode    => '0755',
+    owner   => 'zuul',
+    require => User['zuul'],
+  }
+
+  file { '/etc/zuul/ssl':
     ensure => directory,
+    group  => 'zuul',
+    mode   => '0755',
+    owner  => 'zuul',
+    require => File['/etc/zuul'],
+  }
+
+  if ($gearman_ssl_ca != undef) {
+    file { '/etc/zuul/ssl/ca.pem':
+      ensure  => file,
+      content => $gearman_ssl_ca,
+      group   => 'zuul',
+      mode    => '0644',
+      owner   => 'zuul',
+      require => File['/etc/zuul/ssl'],
+    }
+  }
+
+  if ($gearman_client_ssl_cert != undef) {
+    file { '/etc/zuul/ssl/client.pem':
+      ensure  => file,
+      content => $gearman_client_ssl_cert,
+      group   => 'zuul',
+      mode    => '0644',
+      owner   => 'zuul',
+      require => File['/etc/zuul/ssl'],
+    }
+  }
+
+  if ($gearman_client_ssl_key != undef) {
+    file { '/etc/zuul/ssl/client.key':
+      ensure  => file,
+      content => $gearman_client_ssl_key,
+      group   => 'zuul',
+      mode    => '0640',
+      owner   => 'zuul',
+      require => File['/etc/zuul/ssl'],
+    }
+  }
+
+  if ($gearman_server_ssl_cert != undef) {
+    file { '/etc/zuul/ssl/server.pem':
+      ensure  => file,
+      content => $gearman_server_ssl_cert,
+      group   => 'zuul',
+      mode    => '0644',
+      owner   => 'zuul',
+      require => File['/etc/zuul/ssl'],
+    }
+  }
+
+  if ($gearman_server_ssl_key != undef) {
+    file { '/etc/zuul/ssl/server.key':
+      ensure  => file,
+      content => $gearman_server_ssl_key,
+      group   => 'zuul',
+      mode    => '0640',
+      owner   => 'zuul',
+      require => File['/etc/zuul/ssl'],
+    }
   }
 
   if $zuulv3 {
