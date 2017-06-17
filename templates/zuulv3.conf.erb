@@ -2,26 +2,26 @@
 server=<%= @gearman_server %>
 check_job_registration=<%= @gearman_check_job_registration %>
 <% if @gearman_ssl_ca != nil -%>
-ssl_ca=<%= gearman_ssl_ca %>
+ssl_ca=/etc/zuul/ssl/ca.pem
 <% end -%>
 <% if @gearman_client_ssl_cert != nil -%>
-ssl_cert=<%= gearman_client_ssl_cert %>
+ssl_cert=/etc/zuul/ssl/client.pem
 <% end -%>
 <% if @gearman_client_ssl_key != nil -%>
-ssl_key=<%= gearman_client_ssl_key %>
+ssl_key=/etc/zuul/ssl/client.key
 <% end -%>
 
 [gearman_server]
 start=<%= @internal_gearman %>
 log_config=/etc/zuul/gearman-logging.conf
 <% if @gearman_ssl_ca != nil -%>
-ssl_ca=<%= gearman_ssl_ca %>
+ssl_ca=/etc/zuul/ssl/ca.pem
 <% end -%>
 <% if @gearman_server_ssl_cert != nil -%>
-ssl_cert=<%= gearman_server_ssl_cert %>
+ssl_cert=/etc/zuul/ssl/server.pem
 <% end -%>
 <% if @gearman_server_ssl_key != nil -%>
-ssl_key=<%= gearman_server_ssl_key %>
+ssl_key=/etc/zuul/ssl/server.key
 <% end -%>
 
 [zuul]
