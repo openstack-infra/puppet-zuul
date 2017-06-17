@@ -25,7 +25,8 @@ class zuul::server (
     name       => 'zuul',
     enable     => true,
     hasrestart => true,
-    require    => File['/etc/init.d/zuul'],
+    require    => [File['/etc/init.d/zuul'],
+                  Class['zuul::systemd_reload']]
   }
 
   exec { 'zuul-reload':

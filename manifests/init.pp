@@ -78,6 +78,8 @@ class zuul (
   include ::httpd
   include ::pip
 
+  include ::zuul::systemd_reload
+
   if ($python_version == 3) {
     include ::pip::python3
     $pip_provider = pip3
@@ -449,6 +451,7 @@ class zuul (
     group  => 'root',
     mode   => '0555',
     source => 'puppet:///modules/zuul/zuul.init',
+    notify => Class['zuul::systemd_reload'],
   }
 
   file { '/etc/init.d/zuul-scheduler':
@@ -457,6 +460,7 @@ class zuul (
     group  => 'root',
     mode   => '0555',
     source => 'puppet:///modules/zuul/zuul-scheduler.init',
+    notify => Class['zuul::systemd_reload'],
   }
 
   file { '/etc/init.d/zuul-merger':
@@ -465,6 +469,7 @@ class zuul (
     group  => 'root',
     mode   => '0555',
     source => 'puppet:///modules/zuul/zuul-merger.init',
+    notify => Class['zuul::systemd_reload'],
   }
 
   file { '/etc/init.d/zuul-launcher':
@@ -473,6 +478,7 @@ class zuul (
     group  => 'root',
     mode   => '0555',
     source => 'puppet:///modules/zuul/zuul-launcher.init',
+    notify => Class['zuul::systemd_reload'],
   }
 
   file { '/etc/init.d/zuul-executor':
@@ -481,6 +487,7 @@ class zuul (
     group  => 'root',
     mode   => '0555',
     source => 'puppet:///modules/zuul/zuul-executor.init',
+    notify => Class['zuul::systemd_reload'],
   }
 
   if $proxy_ssl_cert_file_contents == '' {

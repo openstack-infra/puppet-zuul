@@ -24,7 +24,8 @@ class zuul::scheduler (
     ensure     => $ensure,
     enable     => true,
     hasrestart => true,
-    require    => File['/etc/init.d/zuul-scheduler'],
+    require    => [File['/etc/init.d/zuul-scheduler'],
+                  Class['zuul::systemd_reload']]
   }
 
   exec { 'zuul-reload':

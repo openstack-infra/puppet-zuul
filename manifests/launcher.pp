@@ -25,7 +25,8 @@ class zuul::launcher (
     name       => 'zuul-launcher',
     enable     => true,
     hasrestart => true,
-    require    => File['/etc/init.d/zuul-launcher'],
+    require    => [File['/etc/init.d/zuul-launcher'],
+                  Class['zuul::systemd_reload']]
   }
 
   exec { 'zuul-launcher-reload':

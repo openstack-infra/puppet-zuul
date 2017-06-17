@@ -36,7 +36,8 @@ class zuul::executor (
     name       => 'zuul-executor',
     enable     => true,
     hasrestart => true,
-    require    => File['/etc/init.d/zuul-executor'],
+    require    => [File['/etc/init.d/zuul-executor'],
+                  Class['zuul::systemd_reload']]
   }
 
   if $manage_log_conf {
