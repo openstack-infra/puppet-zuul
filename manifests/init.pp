@@ -18,78 +18,55 @@
 # == Class: zuul
 #
 class zuul (
-  $vhost_name = $::fqdn,
-  $serveradmin = "webmaster@${::fqdn}",
-  $gearman_server = '127.0.0.1',
+  $accept_nodes                   = '',
+  $block_referers                 = [],
   $gearman_check_job_registration = true,
-  $internal_gearman = true,
-  $gerrit_server = '',
-  $gerrit_user = '',
-  $gerrit_baseurl = '',
-  $zuul_ssh_private_key = '',
-  $layout_file_name = 'layout.yaml',
-  $zookeeper_hosts = '127.0.0.1:2181',
-  $tenant_file_name = 'main.yaml',
-  $url_pattern = '',
-  $status_url = "https://${::fqdn}/",
-  $zuul_status_url = 'http://127.0.0.1:8001',
-  $zuul_url = '',
-  $git_source_repo = 'https://git.openstack.org/openstack-infra/zuul',
-  $job_name_in_report = false,
-  $revision = 'master',
-  $statsd_host = '',
-  $git_email = '',
-  $git_name = '',
-  $smtp_host = 'localhost',
-  $smtp_port = 25,
-  $smtp_default_from = "zuul@${::fqdn}",
-  $smtp_default_to = "zuul.reports@${::fqdn}",
-  $swift_account_temp_key = '',
-  $swift_authurl = '',
-  $swift_auth_version = '',
-  $swift_user = '',
-  $swift_key = '',
-  $swift_tenant_name = '',
-  $swift_region_name = '',
-  $swift_default_container = '',
+  $gearman_server                 = '127.0.0.1',
+  $gerrit_baseurl                 = '',
+  $gerrit_server                  = '',
+  $gerrit_user                    = '',
+  $git_email                      = '',
+  $git_name                       = '',
+  $git_source_repo                = 'https://git.openstack.org/openstack-infra/zuul',
+  $internal_gearman               = true,
+  $jenkins_jobs                   = '',
+  $job_name_in_report             = false,
+  $layout_file_name               = 'layout.yaml',
+  $nodes                          = [],
+  $proxy_ssl_cert_file_contents   = '',
+  $proxy_ssl_chain_file_contents  = '',
+  $proxy_ssl_key_file_contents    = '',
+  $revision                       = 'master',
+  $serveradmin                    = "webmaster@${::fqdn}",
+  $sites                          = [],
+  $smtp_default_from              = "zuul@${::fqdn}",
+  $smtp_default_to                = "zuul.reports@${::fqdn}",
+  $smtp_host                      = 'localhost',
+  $smtp_port                      = 25,
+  $statsd_host                    = '',
+  $status_url                     = "https://${::fqdn}/",
+  $swift_account_temp_key         = '',
+  $swift_authurl                  = '',
+  $swift_auth_version             = '',
+  $swift_default_container        = '',
+  $swift_default_expiry           = 7200,
   $swift_default_logserver_prefix = '',
-  $swift_default_expiry = 7200,
-  $proxy_ssl_cert_file_contents = '',
-  $proxy_ssl_key_file_contents = '',
-  $proxy_ssl_chain_file_contents = '',
-  $block_referers = [],
-  # Launcher config
-  $accept_nodes = '',
-  $jenkins_jobs = '',
-  $workspace_root = '',
-  $worker_private_key_file = '',
-  $worker_username = '',
-  $sites = [],
-  $nodes = [],
-  $connections = [],
-  $python_version = 2,
-  $zuulv3 = false,
-  $gearman_client_ssl_cert = undef,
-  $gearman_client_ssl_key = undef,
-  $gearman_server_ssl_cert = undef,
-  $gearman_server_ssl_key = undef,
-  $gearman_ssl_ca = undef,
+  $swift_key                      = '',
+  $swift_region_name              = '',
+  $swift_tenant_name              = '',
+  $swift_user                     = '',
+  $url_pattern                    = '',
+  $vhost_name                     = $::fqdn,
+  $worker_private_key_file        = '',
+  $worker_username                = '',
+  $workspace_root                 = '',
+  $zuul_ssh_private_key           = '',
+  $zuul_url                       = '',
 ) {
   include ::httpd
   include ::pip
 
-  if ($python_version == 3) {
-    include ::pip::python3
-    $pip_provider = pip3
-    $pip_command = 'pip3'
-  } else {
-    $pip_provider = openstack_pip
-    $pip_command = 'pip'
-  }
-
   $packages = [
-    'libffi-dev',
-    'libssl-dev',
     'python-paste',
     'python-webob',
   ]
@@ -107,7 +84,7 @@ class zuul (
 
   package { 'yappi':
     ensure   => present,
-    provider => $pip_provider,
+    provider => openstack_pip,
     require  => Class['pip'],
   }
 
@@ -166,15 +143,13 @@ class zuul (
   }
 
   exec { 'install_zuul' :
-    command     => "${pip_command} install -U /opt/zuul",
+    command     => 'pip install -U /opt/zuul',
     path        => '/usr/local/bin:/usr/bin:/bin/',
     refreshonly => true,
     subscribe   => Vcsrepo['/opt/zuul'],
     require     => [
       Class['pip'],
       Package['build-essential'],
-      Package['libffi-dev'],
-      Package['libssl-dev'],
       Package['python-daemon'],
       Package['python-lxml'],
       Package['python-paramiko'],
@@ -187,80 +162,7 @@ class zuul (
   }
 
   file { '/etc/zuul':
-    ensure  => directory,
-    group   => 'zuul',
-    mode    => '0755',
-    owner   => 'zuul',
-    require => User['zuul'],
-  }
-
-  file { '/etc/zuul/ssl':
-    ensure  => directory,
-    group   => 'zuul',
-    mode    => '0755',
-    owner   => 'zuul',
-    require => File['/etc/zuul'],
-  }
-
-  if ($gearman_ssl_ca != undef) {
-    file { '/etc/zuul/ssl/ca.pem':
-      ensure  => file,
-      content => $gearman_ssl_ca,
-      group   => 'zuul',
-      mode    => '0644',
-      owner   => 'zuul',
-      require => File['/etc/zuul/ssl'],
-    }
-  }
-
-  if ($gearman_client_ssl_cert != undef) {
-    file { '/etc/zuul/ssl/client.pem':
-      ensure  => file,
-      content => $gearman_client_ssl_cert,
-      group   => 'zuul',
-      mode    => '0644',
-      owner   => 'zuul',
-      require => File['/etc/zuul/ssl'],
-    }
-  }
-
-  if ($gearman_client_ssl_key != undef) {
-    file { '/etc/zuul/ssl/client.key':
-      ensure  => file,
-      content => $gearman_client_ssl_key,
-      group   => 'zuul',
-      mode    => '0640',
-      owner   => 'zuul',
-      require => File['/etc/zuul/ssl'],
-    }
-  }
-
-  if ($gearman_server_ssl_cert != undef) {
-    file { '/etc/zuul/ssl/server.pem':
-      ensure  => file,
-      content => $gearman_server_ssl_cert,
-      group   => 'zuul',
-      mode    => '0644',
-      owner   => 'zuul',
-      require => File['/etc/zuul/ssl'],
-    }
-  }
-
-  if ($gearman_server_ssl_key != undef) {
-    file { '/etc/zuul/ssl/server.key':
-      ensure  => file,
-      content => $gearman_server_ssl_key,
-      group   => 'zuul',
-      mode    => '0640',
-      owner   => 'zuul',
-      require => File['/etc/zuul/ssl'],
-    }
-  }
-
-  if $zuulv3 {
-    $zuul_conf_content = template('zuul/zuulv3.conf.erb')
-  } else {
-    $zuul_conf_content = template('zuul/zuul.conf.erb')
+    ensure => directory,
   }
 
 # TODO: We should put in  notify either Service['zuul'] or Exec['zuul-reload']
@@ -269,7 +171,7 @@ class zuul (
     ensure  => present,
     owner   => 'zuul',
     mode    => '0400',
-    content => $zuul_conf_content,
+    content => template('zuul/zuul.conf.erb'),
     require => [
       File['/etc/zuul'],
       User['zuul'],
@@ -451,14 +353,6 @@ class zuul (
     source => 'puppet:///modules/zuul/zuul.init',
   }
 
-  file { '/etc/init.d/zuul-scheduler':
-    ensure => present,
-    owner  => 'root',
-    group  => 'root',
-    mode   => '0555',
-    source => 'puppet:///modules/zuul/zuul-scheduler.init',
-  }
-
   file { '/etc/init.d/zuul-merger':
     ensure => present,
     owner  => 'root',
@@ -473,14 +367,6 @@ class zuul (
     group  => 'root',
     mode   => '0555',
     source => 'puppet:///modules/zuul/zuul-launcher.init',
-  }
-
-  file { '/etc/init.d/zuul-executor':
-    ensure => present,
-    owner  => 'root',
-    group  => 'root',
-    mode   => '0555',
-    source => 'puppet:///modules/zuul/zuul-executor.init',
   }
 
   if $proxy_ssl_cert_file_contents == '' {
@@ -571,3 +457,4 @@ class zuul (
   }
 
 }
+
