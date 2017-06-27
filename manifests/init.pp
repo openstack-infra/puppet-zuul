@@ -18,55 +18,72 @@
 # == Class: zuul
 #
 class zuul (
-  $accept_nodes                   = '',
-  $block_referers                 = [],
+  $vhost_name = $::fqdn,
+  $serveradmin = "webmaster@${::fqdn}",
+  $gearman_server = '127.0.0.1',
   $gearman_check_job_registration = true,
-  $gearman_server                 = '127.0.0.1',
-  $gerrit_baseurl                 = '',
-  $gerrit_server                  = '',
-  $gerrit_user                    = '',
-  $git_email                      = '',
-  $git_name                       = '',
-  $git_source_repo                = 'https://git.openstack.org/openstack-infra/zuul',
-  $internal_gearman               = true,
-  $jenkins_jobs                   = '',
-  $job_name_in_report             = false,
-  $layout_file_name               = 'layout.yaml',
-  $nodes                          = [],
-  $proxy_ssl_cert_file_contents   = '',
-  $proxy_ssl_chain_file_contents  = '',
-  $proxy_ssl_key_file_contents    = '',
-  $revision                       = 'master',
-  $serveradmin                    = "webmaster@${::fqdn}",
-  $sites                          = [],
-  $smtp_default_from              = "zuul@${::fqdn}",
-  $smtp_default_to                = "zuul.reports@${::fqdn}",
-  $smtp_host                      = 'localhost',
-  $smtp_port                      = 25,
-  $statsd_host                    = '',
-  $status_url                     = "https://${::fqdn}/",
-  $swift_account_temp_key         = '',
-  $swift_authurl                  = '',
-  $swift_auth_version             = '',
-  $swift_default_container        = '',
-  $swift_default_expiry           = 7200,
+  $internal_gearman = true,
+  $gerrit_server = '',
+  $gerrit_user = '',
+  $gerrit_baseurl = '',
+  $zuul_ssh_private_key = '',
+  $layout_file_name = 'layout.yaml',
+  $zookeeper_hosts = '127.0.0.1:2181',
+  $tenant_file_name = 'main.yaml',
+  $url_pattern = '',
+  $status_url = "https://${::fqdn}/",
+  $zuul_url = '',
+  $git_source_repo = 'https://git.openstack.org/openstack-infra/zuul',
+  $job_name_in_report = false,
+  $revision = 'master',
+  $statsd_host = '',
+  $git_email = '',
+  $git_name = '',
+  $smtp_host = 'localhost',
+  $smtp_port = 25,
+  $smtp_default_from = "zuul@${::fqdn}",
+  $smtp_default_to = "zuul.reports@${::fqdn}",
+  $swift_account_temp_key = '',
+  $swift_authurl = '',
+  $swift_auth_version = '',
+  $swift_user = '',
+  $swift_key = '',
+  $swift_tenant_name = '',
+  $swift_region_name = '',
+  $swift_default_container = '',
   $swift_default_logserver_prefix = '',
-  $swift_key                      = '',
-  $swift_region_name              = '',
-  $swift_tenant_name              = '',
-  $swift_user                     = '',
-  $url_pattern                    = '',
-  $vhost_name                     = $::fqdn,
-  $worker_private_key_file        = '',
-  $worker_username                = '',
-  $workspace_root                 = '',
-  $zuul_ssh_private_key           = '',
-  $zuul_url                       = '',
+  $swift_default_expiry = 7200,
+  $proxy_ssl_cert_file_contents = '',
+  $proxy_ssl_key_file_contents = '',
+  $proxy_ssl_chain_file_contents = '',
+  $block_referers = [],
+  # Launcher config
+  $accept_nodes = '',
+  $jenkins_jobs = '',
+  $workspace_root = '',
+  $worker_private_key_file = '',
+  $worker_username = '',
+  $sites = [],
+  $nodes = [],
+  $connections = [],
+  $python_version = 2,
+  $zuulv3 = false,
+  $webui = true,
 ) {
-  include ::httpd
   include ::pip
 
+  if ($python_version == 3) {
+    include ::pip::python3
+    $pip_provider = pip3
+    $pip_command = 'pip3'
+  } else {
+    $pip_provider = openstack_pip
+    $pip_command = 'pip'
+  }
+
   $packages = [
+    'libffi-dev',
+    'libssl-dev',
     'python-paste',
     'python-webob',
   ]
@@ -84,7 +101,7 @@ class zuul (
 
   package { 'yappi':
     ensure   => present,
-    provider => openstack_pip,
+    provider => $pip_provider,
     require  => Class['pip'],
   }
 
@@ -143,13 +160,15 @@ class zuul (
   }
 
   exec { 'install_zuul' :
-    command     => 'pip install -U /opt/zuul',
+    command     => "${pip_command} install -U /opt/zuul",
     path        => '/usr/local/bin:/usr/bin:/bin/',
     refreshonly => true,
     subscribe   => Vcsrepo['/opt/zuul'],
     require     => [
       Class['pip'],
       Package['build-essential'],
+      Package['libffi-dev'],
+      Package['libssl-dev'],
       Package['python-daemon'],
       Package['python-lxml'],
       Package['python-paramiko'],
@@ -165,13 +184,19 @@ class zuul (
     ensure => directory,
   }
 
+  if $zuulv3 {
+    $zuul_conf_content = template('zuul/zuulv3.conf.erb')
+  } else {
+    $zuul_conf_content = template('zuul/zuul.conf.erb')
+  }
+
 # TODO: We should put in  notify either Service['zuul'] or Exec['zuul-reload']
 #       at some point, but that still has some problems.
   file { '/etc/zuul/zuul.conf':
     ensure  => present,
     owner   => 'zuul',
     mode    => '0400',
-    content => template('zuul/zuul.conf.erb'),
+    content => $zuul_conf_content,
     require => [
       File['/etc/zuul'],
       User['zuul'],
@@ -232,125 +257,20 @@ class zuul (
     content => $zuul_ssh_private_key,
   }
 
-  file { '/var/lib/zuul/www':
-    ensure  => directory,
-    require => File['/var/lib/zuul'],
-  }
-
-  file { '/var/lib/zuul/www/lib':
-    ensure  => directory,
-    require => File['/var/lib/zuul/www'],
-  }
-
-  package { 'libjs-jquery':
-    ensure => present,
-  }
-
-  file { '/var/lib/zuul/www/jquery.min.js':
-    ensure => absent
-  }
-
-  file { '/var/lib/zuul/www/lib/jquery.min.js':
-    ensure  => link,
-    target  => '/usr/share/javascript/jquery/jquery.min.js',
-    require => [File['/var/lib/zuul/www/lib'],
-                Package['libjs-jquery']],
-  }
-
-  vcsrepo { '/opt/twitter-bootstrap':
-    ensure   => latest,
-    provider => git,
-    revision => 'v3.1.1',
-    source   => 'https://github.com/twbs/bootstrap.git',
-  }
-
-  file { '/var/lib/zuul/www/bootstrap':
-    ensure => absent
-  }
-
-  file { '/var/lib/zuul/www/lib/bootstrap':
-    ensure  => link,
-    target  => '/opt/twitter-bootstrap/dist',
-    require => [File['/var/lib/zuul/www/lib'],
-                Package['libjs-jquery'],
-                Vcsrepo['/opt/twitter-bootstrap']],
-  }
-
-  vcsrepo { '/opt/jquery-visibility':
-    ensure   => latest,
-    provider => git,
-    revision => 'master',
-    source   => 'https://github.com/mathiasbynens/jquery-visibility.git',
-  }
-
-  file { '/var/lib/zuul/www/jquery-visibility.min.js':
-    ensure => absent
-  }
-
-  exec { 'install-jquery-visibility':
-    command     => 'yui-compressor -o /var/lib/zuul/www/lib/jquery-visibility.js /opt/jquery-visibility/jquery-visibility.js',
-    path        => 'bin:/usr/bin',
-    refreshonly => true,
-    subscribe   => Vcsrepo['/opt/jquery-visibility'],
-    require     => [File['/var/lib/zuul/www/lib'],
-                    Package['yui-compressor'],
-                    Vcsrepo['/opt/jquery-visibility']],
-  }
-
-  vcsrepo { '/opt/graphitejs':
-    ensure   => latest,
-    provider => git,
-    revision => 'master',
-    source   => 'https://github.com/prestontimmons/graphitejs.git',
-  }
-
-  file { '/var/lib/zuul/www/jquery.graphite.js':
-    ensure => absent
-  }
-
-  file { '/var/lib/zuul/www/lib/jquery.graphite.js':
-    ensure  => link,
-    target  => '/opt/graphitejs/jquery.graphite.js',
-    require => [File['/var/lib/zuul/www/lib'],
-                Vcsrepo['/opt/graphitejs']],
-  }
-
-  file { '/var/lib/zuul/www/index.html':
-    ensure  => link,
-    target  => '/opt/zuul/etc/status/public_html/index.html',
-    require => File['/var/lib/zuul/www'],
-  }
-
-  file { '/var/lib/zuul/www/styles':
-    ensure  => link,
-    target  => '/opt/zuul/etc/status/public_html/styles',
-    require => File['/var/lib/zuul/www'],
-  }
-
-  file { '/var/lib/zuul/www/zuul.app.js':
-    ensure  => link,
-    target  => '/opt/zuul/etc/status/public_html/zuul.app.js',
-    require => File['/var/lib/zuul/www'],
-  }
-
-  file { '/var/lib/zuul/www/jquery.zuul.js':
-    ensure  => link,
-    target  => '/opt/zuul/etc/status/public_html/jquery.zuul.js',
-    require => File['/var/lib/zuul/www'],
-  }
-
-  file { '/var/lib/zuul/www/images':
-    ensure  => link,
-    target  => '/opt/zuul/etc/status/public_html/images',
-    require => File['/var/lib/zuul/www'],
-  }
-
   file { '/etc/init.d/zuul':
     ensure => present,
     owner  => 'root',
     group  => 'root',
     mode   => '0555',
     source => 'puppet:///modules/zuul/zuul.init',
+  }
+
+  file { '/etc/init.d/zuul-scheduler':
+    ensure => present,
+    owner  => 'root',
+    group  => 'root',
+    mode   => '0555',
+    source => 'puppet:///modules/zuul/zuul-scheduler.init',
   }
 
   file { '/etc/init.d/zuul-merger':
@@ -369,92 +289,22 @@ class zuul (
     source => 'puppet:///modules/zuul/zuul-launcher.init',
   }
 
-  if $proxy_ssl_cert_file_contents == '' {
-    $ssl = false
-  } else {
-    $ssl = true
-    file { '/etc/ssl/certs':
-      ensure => directory,
-      owner  => 'root',
-      group  => 'root',
-      mode   => '0755',
-    }
-    file { '/etc/ssl/private':
-      ensure => directory,
-      owner  => 'root',
-      group  => 'root',
-      mode   => '0700',
-    }
-    file { "/etc/ssl/certs/${vhost_name}.pem":
-      ensure  => present,
-      owner   => 'root',
-      group   => 'root',
-      mode    => '0644',
-      content => $proxy_ssl_cert_file_contents,
-      require => File['/etc/ssl/certs'],
-      before  => Httpd::Vhost[$vhost_name],
-    }
-    file { "/etc/ssl/private/${vhost_name}.key":
-      ensure  => present,
-      owner   => 'root',
-      group   => 'root',
-      mode    => '0600',
-      content => $proxy_ssl_key_file_contents,
-      require => File['/etc/ssl/private'],
-      before  => Httpd::Vhost[$vhost_name],
-    }
-    if $proxy_ssl_chain_file_contents != '' {
-      file { "/etc/ssl/certs/${vhost_name}_intermediate.pem":
-        ensure  => present,
-        owner   => 'root',
-        group   => 'root',
-        mode    => '0644',
-        content => $proxy_ssl_chain_file_contents,
-        require => File['/etc/ssl/certs'],
-        before  => Httpd::Vhost[$vhost_name],
-      }
-    }
+  file { '/etc/init.d/zuul-executor':
+    ensure => present,
+    owner  => 'root',
+    group  => 'root',
+    mode   => '0555',
+    source => 'puppet:///modules/zuul/zuul-executor.init',
   }
 
-  ::httpd::vhost { $vhost_name:
-    port       => 443, # Is required despite not being used.
-    docroot    => 'MEANINGLESS ARGUMENT',
-    priority   => '50',
-    ssl        => $ssl,
-    template   => 'zuul/zuul.vhost.erb',
-    vhost_name => $vhost_name,
-  }
-  if ! defined(Httpd::Mod['rewrite']) {
-    httpd::mod { 'rewrite': ensure => present }
-  }
-  if ! defined(Httpd::Mod['proxy']) {
-    httpd::mod { 'proxy': ensure => present }
-  }
-  if ! defined(Httpd::Mod['proxy_http']) {
-    httpd::mod { 'proxy_http': ensure => present }
-  }
-  if ! defined(Httpd::Mod['cache']) {
-    httpd::mod { 'cache': ensure => present }
-  }
-  if ! defined(Httpd::Mod['cgid']) {
-    httpd::mod { 'cgid': ensure => present }
-  }
-
-  case $::lsbdistcodename {
-    'precise': {
-      if ! defined(Httpd::Mod['mem_cache']) {
-        httpd::mod { 'mem_cache': ensure => present }
-      }
-      if ! defined(Httpd::Mod['version']) {
-        httpd::mod { 'version': ensure => present }
-      }
-    }
-    default: {
-      if ! defined(Httpd::Mod['cache_disk']) {
-        httpd::mod { 'cache_disk': ensure => present }
-      }
+  if $webui {
+    class { '::zuul::webui':
+      vhost_name                    => $vhost_name,
+      serveradmin                   => $serveradmin,
+      proxy_ssl_cert_file_contents  => $proxy_ssl_cert_file_contents,
+      proxy_ssl_key_file_contents   => $proxy_ssl_key_file_contents,
+      proxy_ssl_chain_file_contents => $proxy_ssl_chain_file_contents,
+      block_referers                => $block_referers,
     }
   }
-
 }
-
