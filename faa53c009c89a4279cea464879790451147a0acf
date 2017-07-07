@@ -1,0 +1,8 @@
+Code-Review+2: Monty Taylor <mordred@inaugust.com>
+Workflow+1: Monty Taylor <mordred@inaugust.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Fri, 07 Jul 2017 18:04:57 +0000
+Reviewed-on: https://review.openstack.org/481707
+Project: openstack-infra/puppet-zuul
+Branch: refs/heads/master
