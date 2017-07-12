@@ -67,6 +67,7 @@ class zuul (
   $sites = [],
   $nodes = [],
   $connections = [],
+  $connection_secrets = [],
   $trusted_ro_dirs = [],
   $trusted_rw_dirs = [],
   $untrusted_ro_dirs = [],
