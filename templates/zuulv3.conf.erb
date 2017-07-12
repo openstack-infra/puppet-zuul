@@ -56,6 +56,15 @@ trusted_rw_dirs=<%= @trusted_rw_dirs.join(':') %>
 untrusted_ro_dirs=<%= @untrusted_ro_dirs.join(':') %>
 untrusted_rw_dirs=<%= @untrusted_rw_dirs.join(':') %>
 
+[web]
+log_config=/etc/zuul/web-logging.conf
+<% if @web_listen_address != "" -%>
+listen_address=<%= @web_listen_address %>
+<% end -%>
+<% if @web_listen_port != "" -%>
+listen_port=<%= @web_listen_port %>
+<% end -%>
+
 <% @connections.each do |connection| -%>
 [connection "<%= connection['name'] %>"]
 <% connection.each do |key,value| -%>
