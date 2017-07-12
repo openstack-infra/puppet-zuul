@@ -70,5 +70,13 @@ listen_port=<%= @web_listen_port %>
 <% connection.each do |key,value| -%>
 <%= key %>=<%= value %>
 <% end -%>
+<% @connection_secrets.each do |connection_secret| -%>
+<% if connection_secret['name'] == connection['name'] -%>
+<% connection_secret.each do |key,value| -%>
+<% if key != 'name' -%>
+<%= key %>=<%= value %>
+<% end -%>
+<% end -%>
+<% end -%>
 
 <% end -%>
