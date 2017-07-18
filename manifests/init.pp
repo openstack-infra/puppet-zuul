@@ -78,6 +78,8 @@ class zuul (
   $gearman_server_ssl_cert = undef,
   $gearman_server_ssl_key = undef,
   $gearman_ssl_ca = undef,
+  $zuul_web_url = 'http://127.0.0.1:9000',
+  $zuul_scheduler_url = 'http://127.0.0.1:8001',
 ) {
   include ::httpd
   include ::pip
@@ -563,6 +565,9 @@ class zuul (
   }
   if ! defined(Httpd::Mod['cgid']) {
     httpd::mod { 'cgid': ensure => present }
+  }
+  if !defined(Mod['proxy_wstunnel']) {
+    httpd::mod { 'proxy_wstunnel': ensure => present }
   }
 
   case $::lsbdistcodename {
