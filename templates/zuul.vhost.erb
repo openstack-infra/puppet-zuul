@@ -36,7 +36,7 @@
   RewriteRule ^/status.json$ <%= @zuul_status_url %>/status.json [P]
   RewriteRule ^/status/(.*) <%= @zuul_status_url %>/status/$1 [P]
   RewriteRule ^/connection/(.*) <%= @zuul_scheduler_url %>/connection/$1 [P]
-  RewriteRule ^/console-stream <%= @zuul_web_url %>/console-stream [P]
+  RewriteRule ^/console-stream <%= @zuul_web_url.sub('http://', 'ws://') %>/console-stream [P]
   RewriteRule ^/static/(.*) <%= @zuul_web_url %>/static/$1 [P]
   RewriteRule ^/jobs/(.*) <%= @zuul_web_url %>/jobs/$1 [P]
 
@@ -105,7 +105,7 @@
   RewriteRule ^/status.json$ <%= @zuul_status_url %>/status.json [P]
   RewriteRule ^/status/(.*) <%= @zuul_status_url %>/status/$1 [P]
   RewriteRule ^/connection/(.*) <%= @zuul_scheduler_url %>/connection/$1 [P]
-  RewriteRule ^/console-stream <%= @zuul_web_url %>/console-stream [P]
+  RewriteRule ^/console-stream <%= @zuul_web_url.sub('http://', 'ws://') %>/console-stream [P]
   RewriteRule ^/static/(.*) <%= @zuul_web_url %>/static/$1 [P]
   RewriteRule ^/jobs/(.*) <%= @zuul_web_url %>/jobs/$1 [P]
 
