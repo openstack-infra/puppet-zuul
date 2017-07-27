@@ -113,6 +113,12 @@ class zuul (
     }
   }
 
+  package { 'PyMySQL':
+    ensure   => present,
+    provider => $pip_provider,
+    require  => Class['pip'],
+  }
+
   package { 'yappi':
     ensure   => present,
     provider => $pip_provider,
