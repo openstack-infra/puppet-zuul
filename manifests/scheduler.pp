@@ -19,7 +19,29 @@ class zuul::scheduler (
   $ensure = undef,
   $layout_dir = '',
   $manage_log_conf = true,
+  $python_version = 2,
+  $use_mysql = false,
 ) {
+
+  include ::pip
+
+  if ($use_mysql) {
+      if ($python_version == 3) {
+        include ::pip::python3
+        $pip_provider = pip3
+        $pip_command = 'pip3'
+      } else {
+        $pip_provider = openstack_pip
+        $pip_command = 'pip'
+      }
+
+      package { 'PyMySQL':
+        ensure   => present,
+        provider => $pip_provider,
+        require  => Class['pip'],
+      }
+  }
+
   if ($::operatingsystem == 'Ubuntu') and ($::operatingsystemrelease >= '16.04') {
     # This is a hack to make sure that systemd is aware of the new service
     # before we attempt to start it.
