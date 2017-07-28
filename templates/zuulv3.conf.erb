@@ -55,6 +55,9 @@ trusted_ro_dirs=<%= @trusted_ro_dirs.join(':') %>
 trusted_rw_dirs=<%= @trusted_rw_dirs.join(':') %>
 untrusted_ro_dirs=<%= @untrusted_ro_dirs.join(':') %>
 untrusted_rw_dirs=<%= @untrusted_rw_dirs.join(':') %>
+<% if @disk_limit_per_job != "" -%>
+disk_limit_per_job=<%= @disk_limit_per_job %>
+<% end -%>
 
 [web]
 log_config=/etc/zuul/web-logging.conf

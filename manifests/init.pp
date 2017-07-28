@@ -72,6 +72,7 @@ class zuul (
   $trusted_rw_dirs = [],
   $untrusted_ro_dirs = [],
   $untrusted_rw_dirs = [],
+  $disk_limit_per_job = '',
   $python_version = 2,
   $zuulv3 = false,
   $gearman_client_ssl_cert = undef,
