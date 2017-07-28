@@ -79,6 +79,7 @@ class zuul (
   $gearman_server_ssl_cert = undef,
   $gearman_server_ssl_key = undef,
   $gearman_ssl_ca = undef,
+  $github_app_private_key = undef,
   $zuul_web_url = 'http://127.0.0.1:9000',
   $zuul_scheduler_url = 'http://127.0.0.1:8001',
 ) {
@@ -337,6 +338,24 @@ class zuul (
     mode    => '0400',
     require => File['/var/lib/zuul/ssh'],
     content => $zuul_ssh_private_key,
+  }
+
+  file { '/etc/zuul/github':
+    ensure  => directory,
+    group   => 'zuul',
+    mode    => '0755',
+    owner   => 'zuul',
+    require => File['/etc/zuul'],
+  }
+
+  if ($github_app_private_key != undef) {
+    file { '/etc/zuul/github/private.pem':
+        owner   => 'zuul',
+        group   => 'zuul',
+        mode    => '0400',
+        require => File['/etc/zuul/github'],
+        content => $github_app_private_key,
+    }
   }
 
   file { '/var/lib/zuul/www':
