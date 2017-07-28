@@ -51,10 +51,10 @@ log_config=/etc/zuul/executor-logging.conf
 <% if @worker_private_key_file != "" -%>
 private_key_file=<%= @worker_private_key_file %>
 <% end -%>
-trusted_ro_dirs=<%= @trusted_ro_dirs.join(':') %>
-trusted_rw_dirs=<%= @trusted_rw_dirs.join(':') %>
-untrusted_ro_dirs=<%= @untrusted_ro_dirs.join(':') %>
-untrusted_rw_dirs=<%= @untrusted_rw_dirs.join(':') %>
+trusted_ro_path=<%= @trusted_ro_path.join(':') %>
+trusted_rw_path=<%= @trusted_rw_path.join(':') %>
+untrusted_ro_path=<%= @untrusted_ro_path.join(':') %>
+untrusted_rw_path=<%= @untrusted_rw_path.join(':') %>
 <% if @disk_limit_per_job != "" -%>
 disk_limit_per_job=<%= @disk_limit_per_job %>
 <% end -%>
