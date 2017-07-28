@@ -55,6 +55,10 @@ trusted_ro_dirs=<%= @trusted_ro_dirs.join(':') %>
 trusted_rw_dirs=<%= @trusted_rw_dirs.join(':') %>
 untrusted_ro_dirs=<%= @untrusted_ro_dirs.join(':') %>
 untrusted_rw_dirs=<%= @untrusted_rw_dirs.join(':') %>
+trusted_ro_paths=<%= @trusted_ro_paths.join(':') %>
+trusted_rw_paths=<%= @trusted_rw_paths.join(':') %>
+untrusted_ro_paths=<%= @untrusted_ro_paths.join(':') %>
+untrusted_rw_paths=<%= @untrusted_rw_paths.join(':') %>
 <% if @disk_limit_per_job != "" -%>
 disk_limit_per_job=<%= @disk_limit_per_job %>
 <% end -%>
