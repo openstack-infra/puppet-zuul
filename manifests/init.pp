@@ -86,6 +86,7 @@ class zuul (
   $gearman_ssl_ca = undef,
   $zuul_web_url = 'http://127.0.0.1:9000',
   $zuul_scheduler_url = 'http://127.0.0.1:8001',
+  $site_variables_yaml_file = undef,
 ) {
   include ::httpd
   include ::pip
@@ -546,6 +547,18 @@ class zuul (
         require => File['/etc/ssl/certs'],
         before  => Httpd::Vhost[$vhost_name],
       }
+    }
+  }
+
+  if $site_variables_yaml_file != undef {
+    file { '/etc/zuul/site-variables.yaml':
+      ensure  => file,
+      group   => 'zuul',
+      mode    => '0644',
+      owner   => 'zuul',
+      replace => true,
+      require => File['/etc/zuul'],
+      source  => $site_variables_yaml_file,
     }
   }
 

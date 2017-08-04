@@ -19,7 +19,6 @@
 class zuul::executor (
   $ensure = undef,
   $manage_log_conf = true,
-  $site_variable_yaml_file = undef,
 ) {
   include ::apt
   apt::ppa { 'ppa:openstack-ci-core/bubblewrap': }
@@ -56,18 +55,6 @@ class zuul::executor (
     file { '/etc/zuul/executor-logging.conf':
       ensure => present,
       source => 'puppet:///modules/zuul/executor-logging.conf',
-    }
-  }
-
-  if $site_variable_yaml_file != undef {
-    file { '/etc/zuul/site-variables.yaml':
-      ensure  => file,
-      group   => 'zuul',
-      mode    => '0644',
-      owner   => 'zuul',
-      replace => true,
-      require => File['/etc/zuul'],
-      source  => $site_variable_yaml_file,
     }
   }
 

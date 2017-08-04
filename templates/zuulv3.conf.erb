@@ -48,6 +48,9 @@ git_user_name=<%= @git_name %>
 
 [executor]
 log_config=/etc/zuul/executor-logging.conf
+<% if @site_variables_yaml_file != nil -%>
+variables=/etc/zuul/site-variables.yaml
+<% end -%>
 <% if @worker_private_key_file != "" -%>
 private_key_file=<%= @worker_private_key_file %>
 <% end -%>
