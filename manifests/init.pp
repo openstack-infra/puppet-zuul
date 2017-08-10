@@ -184,7 +184,10 @@ class zuul (
     command     => "${pip_command} install -U /opt/zuul",
     path        => '/usr/local/bin:/usr/bin:/bin/',
     refreshonly => true,
-    subscribe   => Vcsrepo['/opt/zuul'],
+    subscribe   => [
+      Vcsrepo['/opt/zuul'],
+      Exec['ensure zuul'],
+    ],
     require     => [
       Class['pip'],
       Package['build-essential'],
@@ -199,6 +202,11 @@ class zuul (
       Package['yappi'],
       Package['yui-compressor'],
     ],
+  }
+
+  exec { 'ensure zuul':
+    command => "echo triggering reinstall if zuul install got borked",
+    creates => "/usr/local/bin/zuul",
   }
 
   file { '/etc/zuul':
