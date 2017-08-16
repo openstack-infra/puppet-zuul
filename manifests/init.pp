@@ -323,6 +323,12 @@ class zuul (
     group  => 'zuul',
   }
 
+  file { '/var/lib/zuul/builds':
+    ensure  => directory,
+    owner   => 'zuul',
+    require => File['/var/lib/zuul'],
+  }
+
   file { '/var/lib/zuul/git':
     ensure  => directory,
     owner   => 'zuul',
