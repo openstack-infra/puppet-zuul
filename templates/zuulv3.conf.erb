@@ -48,6 +48,7 @@ git_user_name=<%= @git_name %>
 
 [executor]
 log_config=/etc/zuul/executor-logging.conf
+job_dir=/var/lib/zuul/builds
 <% if @site_variables_yaml_file != nil -%>
 variables=/etc/zuul/site-variables.yaml
 <% end -%>
