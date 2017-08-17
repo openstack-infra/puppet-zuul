@@ -67,6 +67,7 @@ do_start()
 do_stop()
 {
     $DAEMON stop
+    rm -f /var/run/$NAME/*
     return 0
 }
 
