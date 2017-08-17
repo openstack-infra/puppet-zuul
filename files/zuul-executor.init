@@ -47,6 +47,7 @@ do_start()
     mkdir -p /var/run/$NAME
     chown $USER /var/run/$NAME
     ulimit -n 8192
+    ulimit -c unlimited
     if [ -f $PIDFILE ]; then
         return 3
     fi
