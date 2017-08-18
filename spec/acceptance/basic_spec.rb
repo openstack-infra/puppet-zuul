@@ -1,4 +1,4 @@
-require 'spec_helper_acceptance'
+require 'puppet-openstack_infra_spec_helper/spec_helper_acceptance'
 
 describe 'puppet-zuul module', :if => ['debian', 'ubuntu'].include?(os[:family]) do
   def pp_path
