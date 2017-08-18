@@ -22,6 +22,8 @@ class zuul::executor (
 ) {
   include ::apt
   apt::ppa { 'ppa:openstack-ci-core/bubblewrap': }
+  # Temporary PPA needed for bpo-27945 while waiting for SRU to be published
+  apt::ppa { 'ppa:openstack-ci-core/python-bpo-27945-backport': }
 
   package { 'bubblewrap':
     ensure  => present,
