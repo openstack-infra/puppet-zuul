@@ -1,0 +1,9 @@
+Code-Review+2: James E. Blair <corvus@inaugust.com>
+Code-Review+2: Clark Boylan <cboylan@sapwetik.org>
+Workflow+1: Clark Boylan <cboylan@sapwetik.org>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Mon, 21 Aug 2017 19:57:01 +0000
+Reviewed-on: https://review.openstack.org/494660
+Project: openstack-infra/puppet-zuul
+Branch: refs/heads/master
