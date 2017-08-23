@@ -31,7 +31,7 @@ class zuul::launcher (
 
   exec { 'zuul-launcher-reload':
     command     => '/etc/init.d/zuul-launcher reload',
-    require     => File['/etc/init.d/zuul-launcher'],
+    require     => Service['zuul-launcher'],
     refreshonly => true,
   }
 
@@ -39,6 +39,7 @@ class zuul::launcher (
     file { '/etc/zuul/launcher-logging.conf':
       ensure => present,
       source => 'puppet:///modules/zuul/launcher-logging.conf',
+      notify => Exec['zuul-launcher-reload'],
     }
   }
 
