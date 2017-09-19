@@ -26,6 +26,7 @@ class zuul (
   $gerrit_server = '',
   $gerrit_user = '',
   $gerrit_baseurl = '',
+  $gerrit_strip_branch_ref = '',
   $zuul_ssh_private_key = '',
   $layout_file_name = 'layout.yaml',
   $zookeeper_hosts = '127.0.0.1:2181',
