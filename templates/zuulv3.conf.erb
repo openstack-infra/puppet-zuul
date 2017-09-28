@@ -34,6 +34,9 @@ status_url=<%= @status_url %>
 
 [zookeeper]
 hosts=<%= @zookeeper_hosts %>
+<% if @zookeeper_session_timeout != nil -%>
+session_timeout=<%= @zookeeper_session_timeout %>
+<% end -%>
 
 [merger]
 git_dir=/var/lib/zuul/git

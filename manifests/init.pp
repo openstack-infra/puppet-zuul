@@ -30,6 +30,7 @@ class zuul (
   $zuul_ssh_private_key = '',
   $layout_file_name = 'layout.yaml',
   $zookeeper_hosts = '127.0.0.1:2181',
+  $zookeeper_session_timeout = undef,
   $tenant_file_name = 'main.yaml',
   $url_pattern = '',
   $status_url = "https://${::fqdn}/",
