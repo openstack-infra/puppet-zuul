@@ -183,7 +183,7 @@ class zuul (
   }
 
   exec { 'install_zuul' :
-    command     => "${pip_command} install -U /opt/zuul",
+    command     => "${pip_command} install -U -r/opt/zuul/requirements.txt && ${pip_command} install --no-deps -U /opt/zuul",
     path        => '/usr/local/bin:/usr/bin:/bin/',
     refreshonly => true,
     subscribe   => Vcsrepo['/opt/zuul'],
