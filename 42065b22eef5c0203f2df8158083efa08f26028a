@@ -1,0 +1,10 @@
+Code-Review+2: Monty Taylor <mordred@inaugust.com>
+Code-Review+2: Paul Belanger <pabelanger@redhat.com>
+Workflow+1: Paul Belanger <pabelanger@redhat.com>
+Code-Review+2: Jeremy Stanley <fungi@yuggoth.org>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Fri, 13 Oct 2017 20:40:55 +0000
+Reviewed-on: https://review.openstack.org/511018
+Project: openstack-infra/puppet-zuul
+Branch: refs/heads/master
