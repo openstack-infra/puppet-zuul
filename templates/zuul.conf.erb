@@ -6,11 +6,6 @@ check_job_registration=<%= @gearman_check_job_registration %>
 start=<%= @internal_gearman %>
 log_config=/etc/zuul/gearman-logging.conf
 
-<% if @statsd_host != "" %>
-[statsd]
-server=<%= @statsd_host %>
-<% end %>
-
 <% if @gerrit_server != "" -%>
 [gerrit]
 server=<%= @gerrit_server %>
