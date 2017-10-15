@@ -38,6 +38,11 @@ hosts=<%= @zookeeper_hosts %>
 session_timeout=<%= @zookeeper_session_timeout %>
 <% end -%>
 
+<% if @statsd_host != "" %>
+[statsd]
+server=<%= @statsd_host %>
+<% end %>
+
 [merger]
 git_dir=/var/lib/zuul/git
 zuul_url=<%= @zuul_url %>
