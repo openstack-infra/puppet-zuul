@@ -36,7 +36,7 @@ class zuul::executor (
   include ::pip::python3
 
   package { 'ara':
-    ensure   => present,
+    ensure   => latest,
     provider => 'pip3',
     require  => Class['pip'],
   }
