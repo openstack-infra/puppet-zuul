@@ -115,6 +115,12 @@ class zuul (
     ensure => present,
   }
 
+  if !defined(Package['curl']) {
+    package { 'curl':
+      ensure => present
+    }
+  }
+
   # yappi, pyzmq requires this to build
   if ! defined(Package['build-essential']) {
     package { 'build-essential':
@@ -377,6 +383,17 @@ class zuul (
     target  => '/usr/share/javascript/jquery/jquery.min.js',
     require => [File['/var/lib/zuul/www/lib'],
                 Package['libjs-jquery']],
+  }
+
+  # Download angular
+  # NOTE: This is using a hardcoded URL because soon this will shift to being
+  # based on a more javascript-native toolchain.
+  exec { 'get-angular':
+    command => "curl https://code.angularjs.org/1.5.8/angular.min.js -z /var/lib/zuul/www/lib/angular.min.js -o /var/lib/zuul/www/lib/angular.min.js",
+    path    => '/bin:/usr/bin',
+    require => Package[curl],
+    onlyif  => "curl -I https://code.angularjs.org/1.5.8/angular.min.js -z /var/lib/zuul/www/lib/angular.min.js | grep '200 OK'",
+    creates => "/var/lib/zuul/www/lib/angular.min.js",
   }
 
   vcsrepo { '/opt/twitter-bootstrap':
