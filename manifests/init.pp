@@ -467,6 +467,32 @@ class zuul (
     require => File['/var/lib/zuul/www'],
   }
 
+  if $zuulv3 {
+    file { '/etc/default/zuul-executor':
+      ensure  => present,
+      mode    => '0444',
+      content => "PIDFILE=/var/run/zuul/executor.pid\n",
+    }
+
+    file { '/etc/default/zuul-scheduler':
+      ensure  => present,
+      mode    => '0444',
+      content => "PIDFILE=/var/run/zuul/scheduler.pid\n",
+    }
+
+    file { '/etc/default/zuul-merger':
+      ensure  => present,
+      mode    => '0444',
+      content => "PIDFILE=/var/run/zuul/merger.pid\n",
+    }
+
+    file { '/etc/default/zuul-web':
+      ensure  => present,
+      mode    => '0444',
+      content => "PIDFILE=/var/run/zuul/web.pid\n",
+    }
+  }
+
   file { '/etc/init.d/zuul':
     ensure => present,
     owner  => 'root',
