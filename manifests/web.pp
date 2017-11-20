@@ -69,4 +69,64 @@ class zuul::web (
     ],
     require => Service['zuul-web'],
   }
+
+  if !defined(Package['curl']) {
+    package { 'curl':
+      ensure => present
+    }
+  }
+
+  file { '/var/lib/zuul/www/static':
+    ensure  => directory,
+    require => File['/var/lib/zuul/www'],
+  }
+
+  file { '/var/lib/zuul/www/static/js':
+    ensure  => directory,
+    require => File['/var/lib/zuul/www/static'],
+  }
+
+  file { '/var/lib/zuul/www/static/js/jquery.min.js':
+    ensure  => link,
+    target  => '/usr/share/javascript/jquery/jquery.min.js',
+    require => [File['/var/lib/zuul/www/static/js'],
+                Package['libjs-jquery']],
+  }
+
+  file { '/var/lib/zuul/www/static/bootstrap':
+    ensure  => link,
+    target  => '/opt/twitter-bootstrap/dist',
+    require => [File['/var/lib/zuul/www/static'],
+                Package['libjs-jquery'],
+                Vcsrepo['/opt/twitter-bootstrap']],
+  }
+
+  exec { 'install-jquery-visibility-zuul-web':
+    command     => 'yui-compressor -o /var/lib/zuul/www/static/js/jquery-visibility.js /opt/jquery-visibility/jquery-visibility.js',
+    path        => 'bin:/usr/bin',
+    refreshonly => true,
+    subscribe   => Vcsrepo['/opt/jquery-visibility'],
+    require     => [File['/var/lib/zuul/www/static/js'],
+                    Package['yui-compressor'],
+                    Vcsrepo['/opt/jquery-visibility']],
+  }
+
+  file { '/var/lib/zuul/www/static/js/jquery.graphite.js':
+    ensure  => link,
+    target  => '/opt/graphitejs/jquery.graphite.js',
+    require => [File['/var/lib/zuul/www/static/js'],
+                Vcsrepo['/opt/graphitejs']],
+  }
+
+  # Download angular
+  # NOTE: This is using a hardcoded URL because soon this will shift to being
+  # based on a more javascript-native toolchain.
+  exec { 'get-angular-zuul-web':
+    command => 'curl https://code.angularjs.org/1.5.8/angular.min.js -z /var/lib/zuul/www/static/js/angular.min.js -o /var/lib/zuul/www/static/js/angular.min.js',
+    path    => '/bin:/usr/bin',
+    require => [Package[curl],
+                File['/var/lib/zuul/www/static/js']],
+    onlyif  => "curl -I https://code.angularjs.org/1.5.8/angular.min.js -z /var/lib/zuul/www/static/js/angular.min.js | grep '200 OK'",
+    creates => '/var/lib/zuul/www/static/js/angular.min.js',
+  }
 }
