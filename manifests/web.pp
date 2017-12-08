@@ -129,4 +129,26 @@ class zuul::web (
     onlyif  => "curl -I https://code.angularjs.org/1.5.8/angular.min.js -z /var/lib/zuul/www/static/js/angular.min.js | grep '200 OK'",
     creates => '/var/lib/zuul/www/static/js/angular.min.js',
   }
+
+  # For now, symlink in the static parts of zuul-web which are not
+  # tenant-scoped since they share a URL space with the external
+  # dependencies.
+  file { '/var/lib/zuul/www/static/javascripts':
+    ensure  => link,
+    target  => '/opt/zuul/zuul/web/static/javascripts',
+    require => [File['/var/lib/zuul/www/static'],
+                Vcsrepo['/opt/zuul']],
+  }
+  file { '/var/lib/zuul/www/static/images':
+    ensure  => link,
+    target  => '/opt/zuul/zuul/web/static/images',
+    require => [File['/var/lib/zuul/www/static'],
+                Vcsrepo['/opt/zuul']],
+  }
+  file { '/var/lib/zuul/www/static/styles':
+    ensure  => link,
+    target  => '/opt/zuul/zuul/web/static/styles',
+    require => [File['/var/lib/zuul/www/static'],
+                Vcsrepo['/opt/zuul']],
+  }
 }
