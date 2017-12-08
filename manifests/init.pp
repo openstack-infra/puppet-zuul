@@ -81,6 +81,7 @@ class zuul (
   $disk_limit_per_job = '',
   $python_version = 2,
   $zuulv3 = false,
+  $zuulv3_tenant = 'openstack',
   $gearman_client_ssl_cert = undef,
   $gearman_client_ssl_key = undef,
   $gearman_server_ssl_cert = undef,
@@ -276,8 +277,10 @@ class zuul (
 
   if $zuulv3 {
     $zuul_conf_content = template('zuul/zuulv3.conf.erb')
+    $zuul_vhost_template = 'zuul/zuul3.vhost.erb'
   } else {
     $zuul_conf_content = template('zuul/zuul.conf.erb')
+    $zuul_vhost_template = 'zuul/zuul.vhost.erb'
   }
 
 # TODO: We should put in  notify either Service['zuul'] or Exec['zuul-reload']
@@ -602,7 +605,7 @@ class zuul (
     docroot    => 'MEANINGLESS ARGUMENT',
     priority   => '50',
     ssl        => $ssl,
-    template   => 'zuul/zuul.vhost.erb',
+    template   => $zuul_vhost_template,
     vhost_name => $vhost_name,
   }
   if ! defined(Httpd::Mod['rewrite']) {
