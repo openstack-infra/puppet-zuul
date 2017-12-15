@@ -33,7 +33,6 @@
   RewriteCond %{HTTP_REFERER} =<%= referer %>
   RewriteRule ^/status.json - [F]
   <% end -%>
-  RewriteRule ^/keys/(.*) <%= @zuul_status_url %>/keys/$1 [P]
 
 <% unless @zuulv3 %>
   RewriteRule ^/status.json$ <%= @zuul_status_url %>/status.json [P]
@@ -49,6 +48,7 @@
   RewriteRule ^/builds.html <%= @zuul_web_url %>/builds.html [P]
   RewriteRule ^/console-stream <%= @zuul_web_url.sub('http://', 'ws://') %>/console-stream [P]
   RewriteRule ^/stream.html <%= @zuul_web_url %>/stream.html [P]
+  RewriteRule ^/(.*).pub$ <%= @zuul_web_url %>/\1.pub [P]
   RewriteRule ^/$ <%= @zuul_web_url %>/status.html [P]
 <% end %>
 
