@@ -35,10 +35,19 @@ class zuul::executor (
 
   include ::pip::python3
 
-  package { 'ara':
-    ensure   => present,
-    provider => 'pip3',
-    require  => Class['pip'],
+  exec { 'install-ara-safely':
+    command => 'pip3 install --upgrade --upgrade-strategy=only-if-needed ara',
+    path    => '/usr/local/bin:/usr/bin:/bin/',
+    # This checks the current installed ara version with pip list and the
+    # latest version of ara on pypi with pip search and if they are different
+    # then we know we need to upgrade to reconcile the local version with
+    # the upstream version.
+    #
+    # We do this using this check here rather than a pip package resource so
+    # that ara's deps don't inadverdently update zuuls deps (specifically
+    # ansible).
+    onlyif  => '/bin/bash -c "test \\"$(pip3 list --format columns | sed -ne \'s/^ara\s\+\(.*\)$/\1/p\')\\" != \\"$(pip3 search \'ara$\' | sed -ne \'s/^ara (\(.*\)).*$/\1/p\')\\""',
+    require => Class['::pip::python3'],
   }
 
   if ($::operatingsystem == 'Ubuntu') and ($::operatingsystemrelease >= '16.04') {
