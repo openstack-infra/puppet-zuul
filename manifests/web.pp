@@ -76,6 +76,45 @@ class zuul::web (
     }
   }
 
+  file { '/var/lib/zuul/www/backup':
+    ensure  => directory,
+    require => File['/var/lib/zuul/www'],
+  }
+
+  # Minutes, hours, days, etc are not specified here because we are interested
+  # in running this *every minute*.
+  # This is a mean of backing up status.json periodically in order to provide
+  # a mean of restoring lost scheduler queues if need be.
+  # We are downloading this file at a location served by the vhost so that we
+  # can query it easily should the need arise.
+  # If the status.json is unavailable for download, no new files are created.
+  if $zuul::proxy_ssl_cert_file_contents != '' {
+    $status = "https://${zuul::vhost_name}/status.json"
+  } else {
+    $status = "http://${zuul::vhost_name}/status.json"
+  }
+  cron { 'zuul_scheduler_status_backup':
+    user    => 'root',
+    command => "timeout -k 5 10 curl ${status} -o /var/lib/zuul/www/backup/status_$(date +%s).json",
+    path    => '/bin:/usr/bin',
+    require => [Package['curl'],
+                User['zuul'],
+                File['/var/lib/zuul/www/backup']],
+  }
+  # Rotate backups and keep no more than 180 files -- or 3 hours worth of
+  # backup if Zuul has 100% uptime.
+  # We're not basing the rotation on time because the scheduler/web service
+  # could be down for an extended period of time.
+  cron { 'zuul_scheduler_status_prune':
+    user    => 'root',
+    minute  => '0',
+    command => 'flock -n /var/run/status_prune.lock for file in $(ls -dt -1 /var/lib/zuul/www/backup/* |sed -e "1,180d"); do rm $file; done',
+    path    => '/bin:/usr/bin',
+    require => [Package['curl'],
+                User['zuul'],
+                File['/var/lib/zuul/www/backup']],
+  }
+
   file { '/var/lib/zuul/www/static':
     ensure  => directory,
     require => File['/var/lib/zuul/www'],
