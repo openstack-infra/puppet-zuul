@@ -19,6 +19,7 @@ class zuul::web (
   $manage_log_conf = true,
   $web_listen_address = '127.0.0.1',
   $web_listen_port = 9000,
+  $enable_status_backups = true,
 ) {
 
   service { 'zuul-web':
@@ -73,6 +74,47 @@ class zuul::web (
   if !defined(Package['curl']) {
     package { 'curl':
       ensure => present
+    }
+  }
+
+  file { '/var/lib/zuul/www/backup':
+    ensure  => directory,
+    require => File['/var/lib/zuul/www'],
+  }
+
+  if $enable_status_backups {
+    # Minutes, hours, days, etc are not specified here because we are
+    # interested in running this *every minute*.
+    # This is a mean of backing up status.json periodically in order to provide
+    # a mean of restoring lost scheduler queues if need be.
+    # We are downloading this file at a location served by the vhost so that we
+    # can query it easily should the need arise.
+    # If the status.json is unavailable for download, no new files are created.
+    if $zuul::proxy_ssl_cert_file_contents != '' {
+      $status = "https://${zuul::vhost_name}/status.json"
+    } else {
+      $status = "http://${zuul::vhost_name}/status.json"
+    }
+    cron { 'zuul_scheduler_status_backup':
+      user    => 'root',
+      command => "timeout -k 5 10 curl ${status} -o /var/lib/zuul/www/backup/status_$(date '+\%s').json",
+      require => [Package['curl'],
+                  User['zuul'],
+                  File['/var/lib/zuul/www/backup']],
+    }
+    # Rotate backups and keep no more than 120 files -- or 2 hours worth of
+    # backup if Zuul has 100% uptime.
+    # We're not basing the rotation on time because the scheduler/web service
+    # could be down for an extended period of time.
+    # This is ran hourly so technically up to ~3 hours worth of backups will
+    # be kept.
+    cron { 'zuul_scheduler_status_prune':
+      user    => 'root',
+      minute  => '0',
+      command => 'flock -n /var/run/status_prune.lock ls -dt -1 /var/lib/zuul/www/backup/* |sed -e "1,120d" |xargs rm -f',
+      require => [Package['curl'],
+                  User['zuul'],
+                  File['/var/lib/zuul/www/backup']],
     }
   }
 
