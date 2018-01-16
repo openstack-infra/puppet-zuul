@@ -276,8 +276,12 @@ class zuul (
 
   if $zuulv3 {
     $zuul_conf_content = template('zuul/zuulv3.conf.erb')
+    $zuul_merger_source = 'puppet:///modules/zuul/zuul-mergerv3.init'
+    $zuul_scheduler_source = 'puppet:///modules/zuul/zuul-schedulerv3.init'
   } else {
     $zuul_conf_content = template('zuul/zuul.conf.erb')
+    $zuul_merger_source = 'puppet:///modules/zuul/zuul-merger.init'
+    $zuul_scheduler_source = 'puppet:///modules/zuul/zuul-scheduler.init'
   }
 
 # TODO: We should put in  notify either Service['zuul'] or Exec['zuul-reload']
@@ -507,7 +511,7 @@ class zuul (
     owner  => 'root',
     group  => 'root',
     mode   => '0555',
-    source => 'puppet:///modules/zuul/zuul-scheduler.init',
+    source => $zuul_scheduler_source,
     notify => Class['zuul::systemd_reload'],
   }
 
@@ -516,7 +520,7 @@ class zuul (
     owner  => 'root',
     group  => 'root',
     mode   => '0555',
-    source => 'puppet:///modules/zuul/zuul-merger.init',
+    source => $zuul_merger_source,
     notify => Class['zuul::systemd_reload'],
   }
 
