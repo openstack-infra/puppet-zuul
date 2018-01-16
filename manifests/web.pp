@@ -97,7 +97,7 @@ class zuul::web (
     }
     cron { 'zuul_scheduler_status_backup':
       user    => 'root',
-      command => "timeout -k 5 10 curl ${status} -o /var/lib/zuul/www/backup/status_$(date +\\%s).json",
+      command => "timeout -k 5 10 curl ${status} -o /var/lib/zuul/www/backup/status_$(date +\\%s).json 2>/dev/null",
       require => [Package['curl'],
                   User['zuul'],
                   File['/var/lib/zuul/www/backup']],
