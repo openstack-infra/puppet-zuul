@@ -11,6 +11,7 @@ class { '::zuul::scheduler':
 }
 
 class { '::zuul::merger': }
+class { '::zuul::executor': }
 class { '::zuul::web': }
 class { '::zuul::fingergw': }
 
