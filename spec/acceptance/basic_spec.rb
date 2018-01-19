@@ -76,7 +76,7 @@ describe 'puppet-zuul module', :if => ['debian', 'ubuntu'].include?(os[:family])
 
     packages.each do |package|
       describe package do
-        it { should be_installed.by('pip') }
+        it { should be_installed.by('pip3') }
       end
     end
   end
@@ -89,7 +89,7 @@ describe 'puppet-zuul module', :if => ['debian', 'ubuntu'].include?(os[:family])
       it { should contain('[gerrit]') }
       it { should contain('server=') }
       it { should contain('[zuul]') }
-      it { should contain('layout_config=/etc/zuul/layout/layout.yaml') }
+      it { should contain('tenant_config=/etc/zuul/layout/main.yaml') }
     end
 
     describe file('/etc/default/zuul') do
@@ -162,16 +162,8 @@ describe 'puppet-zuul module', :if => ['debian', 'ubuntu'].include?(os[:family])
       it { should be_listening }
     end
 
-    describe command("curl http://localhost --location") do
-      its(:stdout) { should contain('Zuul Status') }
-    end
-
     describe port(443) do
       it { should be_listening }
-    end
-
-    describe command("curl https://localhost --insecure --location") do
-      its(:stdout) { should contain('Zuul Status') }
     end
 
     describe port(4730) do
