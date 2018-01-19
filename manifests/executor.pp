@@ -46,6 +46,10 @@ class zuul::executor (
     # We do this using this check here rather than a pip package resource so
     # that ara's deps don't inadverdently update zuuls deps (specifically
     # ansible).
+    #
+    # TODO: This check appears to always fail, causing ara to be
+    # installed on every puppet run.  When this is fixed, update the
+    # beaker rspec to include zuul::executor.
     onlyif  => '/bin/bash -c "test \\"$(pip3 list --format columns | sed -ne \'s/^ara\s\+\(.*\)$/\1/p\')\\" != \\"$(pip3 search \'ara$\' | sed -ne \'s/^ara (\(.*\)).*$/\1/p\')\\""',
     require => Class['::pip::python3'],
   }
