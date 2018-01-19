@@ -40,6 +40,7 @@
 <% end %>
 
 <% if @zuulv3 %>
+  RewriteRule ^/connection/(.*) <%= @zuul_status_url %>/connection/$1 [P]
   RewriteRule ^/status.json <%= @zuul_web_url %>/status.json [P]
   RewriteRule ^/status.html <%= @zuul_web_url %>/status.html [P]
   RewriteRule ^/jobs.json <%= @zuul_web_url %>/jobs.json [P]
@@ -120,6 +121,7 @@
 <% end %>
 
 <% if @zuulv3 %>
+  RewriteRule ^/connection/(.*) <%= @zuul_status_url %>/connection/$1 [P]
   RewriteRule ^/status.json <%= @zuul_web_url %>/status.json [P]
   RewriteRule ^/status.html <%= @zuul_web_url %>/status.html [P]
   RewriteRule ^/jobs.json <%= @zuul_web_url %>/jobs.json [P]
