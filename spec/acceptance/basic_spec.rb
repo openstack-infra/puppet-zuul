@@ -1,7 +1,7 @@
 require 'puppet-openstack_infra_spec_helper/spec_helper_acceptance'
 
 # 既存のリソースタイプにマッチャーを追加する覚書き
-class Specinfra::Command::Debian::Base::Package < Specinfra::Command::Linux::Base::Package
+class Specinfra::Command::Base::Package < Specinfra::Command::Base
   class << self
     def check_is_installed_by_pip3(name, version=nil)
       regexp = "^#{name} "
