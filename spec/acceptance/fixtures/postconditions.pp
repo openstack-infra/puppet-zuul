@@ -1,5 +1,5 @@
-exec { 'starting zuul server':
-  command => '/etc/init.d/zuul start',
+exec { 'starting zuul scheduler':
+  command => '/etc/init.d/zuul-scheduler start',
 }
 
 exec { 'starting zuul merger':
