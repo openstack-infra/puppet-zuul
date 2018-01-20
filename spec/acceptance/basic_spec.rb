@@ -179,9 +179,8 @@ describe 'puppet-zuul module', :if => ['debian', 'ubuntu'].include?(os[:family])
       it { should be_listening }
     end
 
-    # TODO(mordred) Why is this not listening?
-    # describe port(4730) do
-    #   it { should be_listening }
-    # end
+    describe port(4730) do
+      it { should be_listening }
+    end
   end
 end
