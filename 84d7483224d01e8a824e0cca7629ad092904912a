@@ -1,0 +1,9 @@
+Code-Review+2: James E. Blair <corvus@inaugust.com>
+Code-Review+2: Paul Belanger <pabelanger@redhat.com>
+Workflow+1: Paul Belanger <pabelanger@redhat.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Sun, 21 Jan 2018 16:56:29 +0000
+Reviewed-on: https://review.openstack.org/535900
+Project: openstack-infra/puppet-zuul
+Branch: refs/heads/master
