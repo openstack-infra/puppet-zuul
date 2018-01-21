@@ -1,0 +1,9 @@
+Code-Review+2: Monty Taylor <mordred@inaugust.com>
+Code-Review+2: James E. Blair <corvus@inaugust.com>
+Workflow+1: James E. Blair <corvus@inaugust.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Sun, 21 Jan 2018 16:38:40 +0000
+Reviewed-on: https://review.openstack.org/535966
+Project: openstack-infra/puppet-zuul
+Branch: refs/heads/master
