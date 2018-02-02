@@ -1,0 +1,9 @@
+Code-Review+2: Monty Taylor <mordred@inaugust.com>
+Code-Review+2: Jeremy Stanley <fungi@yuggoth.org>
+Workflow+1: Jeremy Stanley <fungi@yuggoth.org>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Fri, 02 Feb 2018 20:22:49 +0000
+Reviewed-on: https://review.openstack.org/538031
+Project: openstack-infra/puppet-zuul
+Branch: refs/heads/master
