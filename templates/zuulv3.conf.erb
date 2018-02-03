@@ -83,6 +83,7 @@ listen_address=<%= @web_listen_address %>
 <% if @web_listen_port != "" -%>
 listen_port=<%= @web_listen_port %>
 <% end -%>
+status_url=<%= @status_url %>
 
 <% @connections.each do |connection| -%>
 [connection "<%= connection['name'] %>"]
