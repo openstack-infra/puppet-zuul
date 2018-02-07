@@ -276,10 +276,12 @@ class zuul (
 
   if $zuulv3 {
     $zuul_conf_content = template('zuul/zuulv3.conf.erb')
+    $zuul_executor_source = 'puppet:///modules/zuul/zuul-executorv3.init'
     $zuul_merger_source = 'puppet:///modules/zuul/zuul-mergerv3.init'
     $zuul_scheduler_source = 'puppet:///modules/zuul/zuul-schedulerv3.init'
   } else {
     $zuul_conf_content = template('zuul/zuul.conf.erb')
+    $zuul_executor_source = 'puppet:///modules/zuul/zuul-executor.init'
     $zuul_merger_source = 'puppet:///modules/zuul/zuul-merger.init'
     $zuul_scheduler_source = 'puppet:///modules/zuul/zuul-scheduler.init'
   }
@@ -538,7 +540,7 @@ class zuul (
     owner  => 'root',
     group  => 'root',
     mode   => '0555',
-    source => 'puppet:///modules/zuul/zuul-executor.init',
+    source => $zuul_executor_source,
     notify => Class['zuul::systemd_reload'],
   }
 
