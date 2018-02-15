@@ -89,6 +89,7 @@ class zuul (
   $zuul_web_url = 'http://127.0.0.1:9000',
   $zuul_scheduler_url = 'http://127.0.0.1:8001',
   $site_variables_yaml_file = undef,
+  $zuul_tenant_name = undef,
 ) {
   include ::httpd
   include ::pip
@@ -102,6 +103,12 @@ class zuul (
   } else {
     $pip_provider = openstack_pip
     $pip_command = 'pip'
+  }
+
+  if ($zuul_tenant_name) {
+    $zuul_web_full_url = "${zuul_web_url}/${zuul_tenant_name}"
+  } else {
+    $zuul_web_full_url = "${zuul_web_url}"
   }
 
   $packages = [
