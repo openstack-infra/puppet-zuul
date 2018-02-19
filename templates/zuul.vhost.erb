@@ -70,11 +70,9 @@
   <IfModule mod_cache.c>
     CacheDefaultExpire 5
     <IfModule mod_mem_cache.c>
+      CacheEnable mem /status.json
 <% if @zuulv3 %>
       CacheEnable mem /status
-      CacheEnable mem /status.json
-<% else %>
-      CacheEnable mem /status.json
 <% end %>
       # 12MByte total cache size.
       MCacheSize 12288
@@ -85,11 +83,9 @@
       MCacheMaxStreamingBuffer 8388608
     </IfModule>
     <IfModule mod_cache_disk.c>
+      CacheEnable disk /status.json
 <% if @zuulv3 %>
       CacheEnable disk /status
-      CacheEnable disk /status.json
-<% else %>
-      CacheEnable disk /status.json
 <% end %>
       CacheRoot /var/cache/apache2/mod_cache_disk
     </IfModule>
@@ -166,11 +162,9 @@
   <IfModule mod_cache.c>
     CacheDefaultExpire 5
     <IfModule mod_mem_cache.c>
+      CacheEnable mem /status.json
 <% if @zuulv3 %>
       CacheEnable mem /status
-      CacheEnable mem /status.json
-<% else %>
-      CacheEnable mem /status.json
 <% end %>
       # 12MByte total cache size.
       MCacheSize 12288
@@ -181,11 +175,9 @@
       MCacheMaxStreamingBuffer 8388608
     </IfModule>
     <IfModule mod_cache_disk.c>
+      CacheEnable disk /status.json
 <% if @zuulv3 %>
       CacheEnable disk /status
-      CacheEnable disk /status.json
-<% else %>
-      CacheEnable disk /status.json
 <% end %>
       CacheRoot /var/cache/apache2/mod_cache_disk
     </IfModule>
