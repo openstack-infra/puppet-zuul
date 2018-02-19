@@ -46,7 +46,6 @@
 <% if @zuulv3 %>
   RewriteRule ^/connection/(.*) <%= @zuul_web_url %>/connection/$1 [P]
   RewriteRule ^/status <%= @zuul_web_full_url %>/status [P]
-  RewriteRule ^/status.json <%= @zuul_web_full_url %>/status [P]
   RewriteRule ^/status.html <%= @zuul_web_full_url %>/status.html [P]
   RewriteRule ^/jobs <%= @zuul_web_full_url %>/jobs [P]
   RewriteRule ^/jobs.html <%= @zuul_web_full_url %>/jobs.html [P]
@@ -140,7 +139,6 @@
 <% if @zuulv3 %>
   RewriteRule ^/connection/(.*) <%= @zuul_web_url %>/connection/$1 [P]
   RewriteRule ^/status <%= @zuul_web_full_url %>/status [P]
-  RewriteRule ^/status.json <%= @zuul_web_full_url %>/status [P]
   RewriteRule ^/status.html <%= @zuul_web_full_url %>/status.html [P]
   RewriteRule ^/jobs <%= @zuul_web_full_url %>/jobs [P]
   RewriteRule ^/jobs.html <%= @zuul_web_full_url %>/jobs.html [P]
