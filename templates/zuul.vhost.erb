@@ -31,9 +31,11 @@
   RewriteEngine on
   <% @block_referers.each do |referer| -%>
   RewriteCond %{HTTP_REFERER} =<%= referer %>
+    <% if @zuulv3 %>
   RewriteRule ^/status - [F]
-  RewriteCond %{HTTP_REFERER} =<%= referer %>
+    <% else %>
   RewriteRule ^/status.json - [F]
+    <% end %>
   <% end -%>
 
 <% unless @zuulv3 %>
@@ -44,13 +46,11 @@
 <% if @zuulv3 %>
   RewriteRule ^/connection/(.*) <%= @zuul_web_url %>/connection/$1 [P]
   RewriteRule ^/status <%= @zuul_web_full_url %>/status [P]
-  RewriteRule ^/status.json <%= @zuul_web_full_url %>/status.json [P]
+  RewriteRule ^/status.json <%= @zuul_web_full_url %>/status [P]
   RewriteRule ^/status.html <%= @zuul_web_full_url %>/status.html [P]
   RewriteRule ^/jobs <%= @zuul_web_full_url %>/jobs [P]
-  RewriteRule ^/jobs.json <%= @zuul_web_full_url %>/jobs.json [P]
   RewriteRule ^/jobs.html <%= @zuul_web_full_url %>/jobs.html [P]
   RewriteRule ^/builds <%= @zuul_web_full_url %>/builds [P]
-  RewriteRule ^/builds.json <%= @zuul_web_full_url %>/builds.json [P]
   RewriteRule ^/builds.html <%= @zuul_web_full_url %>/builds.html [P]
   RewriteRule ^/console-stream <%= @zuul_web_full_url.sub('http://', 'ws://') %>/console-stream [P]
   RewriteRule ^/stream.html <%= @zuul_web_full_url %>/stream.html [P]
@@ -72,7 +72,6 @@
     <IfModule mod_mem_cache.c>
 <% if @zuulv3 %>
       CacheEnable mem /status
-      CacheEnable mem /status.json
 <% else %>
       CacheEnable mem /status.json
 <% end %>
@@ -87,7 +86,6 @@
     <IfModule mod_cache_disk.c>
 <% if @zuulv3 %>
       CacheEnable disk /status
-      CacheEnable disk /status.json
 <% else %>
       CacheEnable disk /status.json
 <% end %>
@@ -128,9 +126,11 @@
   RewriteEngine on
   <% @block_referers.each do |referer| -%>
   RewriteCond %{HTTP_REFERER} =<%= referer %>
+    <% if @zuulv3 %>
   RewriteRule ^/status - [F]
-  RewriteCond %{HTTP_REFERER} =<%= referer %>
+    <% else %>
   RewriteRule ^/status.json - [F]
+    <% end %>
   <% end -%>
 <% unless @zuulv3 %>
   RewriteRule ^/status.json$ <%= @zuul_status_url %>/status.json [P]
@@ -140,13 +140,11 @@
 <% if @zuulv3 %>
   RewriteRule ^/connection/(.*) <%= @zuul_web_url %>/connection/$1 [P]
   RewriteRule ^/status <%= @zuul_web_full_url %>/status [P]
-  RewriteRule ^/status.json <%= @zuul_web_full_url %>/status.json [P]
+  RewriteRule ^/status.json <%= @zuul_web_full_url %>/status [P]
   RewriteRule ^/status.html <%= @zuul_web_full_url %>/status.html [P]
   RewriteRule ^/jobs <%= @zuul_web_full_url %>/jobs [P]
-  RewriteRule ^/jobs.json <%= @zuul_web_full_url %>/jobs.json [P]
   RewriteRule ^/jobs.html <%= @zuul_web_full_url %>/jobs.html [P]
   RewriteRule ^/builds <%= @zuul_web_full_url %>/builds [P]
-  RewriteRule ^/builds.json <%= @zuul_web_full_url %>/builds.json [P]
   RewriteRule ^/builds.html <%= @zuul_web_full_url %>/builds.html [P]
   RewriteRule ^/console-stream <%= @zuul_web_full_url.sub('http://', 'ws://') %>/console-stream [P]
   RewriteRule ^/stream.html <%= @zuul_web_full_url %>/stream.html [P]
