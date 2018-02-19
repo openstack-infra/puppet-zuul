@@ -91,9 +91,9 @@ class zuul::web (
     # can query it easily should the need arise.
     # If the status.json is unavailable for download, no new files are created.
     if $zuul::proxy_ssl_cert_file_contents != '' {
-      $status = "https://${zuul::vhost_name}/status.json"
+      $status = "https://${zuul::vhost_name}/status"
     } else {
-      $status = "http://${zuul::vhost_name}/status.json"
+      $status = "http://${zuul::vhost_name}/status"
     }
     cron { 'zuul_scheduler_status_backup':
       user    => 'root',
