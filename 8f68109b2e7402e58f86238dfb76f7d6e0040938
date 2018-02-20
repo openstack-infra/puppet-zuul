@@ -1,0 +1,9 @@
+Code-Review+2: David Shrewsbury <shrewsbury.dave@gmail.com>
+Code-Review+2: David Moreau Simard <dmsimard@redhat.com>
+Workflow+1: David Moreau Simard <dmsimard@redhat.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Tue, 20 Feb 2018 14:07:16 +0000
+Reviewed-on: https://review.openstack.org/546134
+Project: openstack-infra/puppet-zuul
+Branch: refs/heads/master
