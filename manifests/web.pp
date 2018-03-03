@@ -117,78 +117,73 @@ class zuul::web (
   }
 
   file { '/var/lib/zuul/www/static':
+    ensure  => absent,
+  }
+
+  $zuul_web_root = '/opt/zuul-web'
+  $zuul_web_content_root = '/opt/zuul-web/content'
+  $zuul_web_src_root = '/opt/zuul-web/source'
+  $zuul_web_filename = 'zuul-web-latest.tar.gz'
+  $zuul_web_url = "http://tarballs.openstack.org/zuul/${zuul_web_filename}"
+
+  file { $zuul_web_root:
     ensure  => directory,
-    require => File['/var/lib/zuul/www'],
+    group   => 'zuul',
+    mode    => '0755',
+    owner   => 'zuul',
+    require => User['zuul'],
   }
 
-  file { '/var/lib/zuul/www/static/js':
+  file { $zuul_web_content_root:
     ensure  => directory,
-    require => File['/var/lib/zuul/www/static'],
+    group   => 'zuul',
+    mode    => '0755',
+    owner   => 'zuul',
+    require => User['zuul'],
   }
 
-  file { '/var/lib/zuul/www/static/js/jquery.min.js':
-    ensure  => link,
-    target  => '/usr/share/javascript/jquery/jquery.min.js',
-    require => [File['/var/lib/zuul/www/static/js'],
-                Package['libjs-jquery']],
+  file { $zuul_web_src_root:
+    ensure  => directory,
+    group   => 'zuul',
+    mode    => '0755',
+    owner   => 'zuul',
+    require => User['zuul'],
   }
 
-  file { '/var/lib/zuul/www/static/bootstrap':
-    ensure  => link,
-    target  => '/opt/twitter-bootstrap/dist',
-    require => [File['/var/lib/zuul/www/static'],
-                Package['libjs-jquery'],
-                Vcsrepo['/opt/twitter-bootstrap']],
-  }
-
-  exec { 'install-jquery-visibility-zuul-web':
-    command     => 'yui-compressor -o /var/lib/zuul/www/static/js/jquery-visibility.js /opt/jquery-visibility/jquery-visibility.js',
-    path        => 'bin:/usr/bin',
-    refreshonly => true,
-    subscribe   => Vcsrepo['/opt/jquery-visibility'],
-    require     => [File['/var/lib/zuul/www/static/js'],
-                    Package['yui-compressor'],
-                    Vcsrepo['/opt/jquery-visibility']],
-  }
-
-  file { '/var/lib/zuul/www/static/js/jquery.graphite.js':
-    ensure  => link,
-    target  => '/opt/graphitejs/jquery.graphite.js',
-    require => [File['/var/lib/zuul/www/static/js'],
-                Vcsrepo['/opt/graphitejs']],
-  }
-
-  # Download angular
-  # NOTE: This is using a hardcoded URL because soon this will shift to being
-  # based on a more javascript-native toolchain.
-  exec { 'get-angular-zuul-web':
-    command => 'curl https://code.angularjs.org/1.5.8/angular.min.js -z /var/lib/zuul/www/static/js/angular.min.js -o /var/lib/zuul/www/static/js/angular.min.js',
+  # Download the latest zuul-web
+  exec { 'get-zuul-web':
+    command => "curl ${zuul_web_url} -z ./${zuul_web_filename} -o ${zuul_web_filename}",
     path    => '/bin:/usr/bin',
-    require => [Package[curl],
-                File['/var/lib/zuul/www/static/js']],
-    onlyif  => "curl -I https://code.angularjs.org/1.5.8/angular.min.js -z /var/lib/zuul/www/static/js/angular.min.js | grep '200 OK'",
-    creates => '/var/lib/zuul/www/static/js/angular.min.js',
+    cwd     => $zuul_web_root,
+    require => [
+      File[$zuul_web_root],
+      File[$zuul_web_content_root],
+      File[$zuul_web_src_root],
+    ],
+    onlyif  => "curl -I ${zuul_web_url} -z ./${zuul_web_filename} | grep '200 OK'",
   }
 
-  # For now, symlink in the static parts of zuul-web which are not
-  # tenant-scoped since they share a URL space with the external
-  # dependencies.
-  file { '/var/lib/zuul/www/static/javascripts':
-    ensure  => link,
-    target  => '/opt/zuul/zuul/web/static/javascripts',
-    require => [File['/var/lib/zuul/www/static'],
-                Vcsrepo['/opt/zuul']],
+  # Unpack storyboard-zuul_web
+  exec { 'unpack-zuul-web':
+    command     => "rm ${zuul_web_src_root)/* && tar -C ${zuul_web_src_root) -xzf ./${zuul_web_filename}",
+    path        => '/bin:/usr/bin',
+    refreshonly => true,
+    cwd         => $zuul_web_root,
+    require     => Exec['get-zuul-web'],
+    subscribe   => Exec['get-zuul-web'],
   }
-  file { '/var/lib/zuul/www/static/images':
-    ensure  => link,
-    target  => '/opt/zuul/zuul/web/static/images',
-    require => [File['/var/lib/zuul/www/static'],
-                Vcsrepo['/opt/zuul']],
+
+  # Sync zuul-web to the directory we serve it from. This is so that we don't
+  # have files go missing - but also so that we can clean up old verisons of
+  # files. The assets built by webpack have hashes in the filenames to help
+  # with caching.
+  exec { 'sync-zuul-web':
+    command     => "rsync -rl --delete-delay . ${zuul_web_content_root}/",
+    path        => '/bin:/usr/bin',
+    refreshonly => true,
+    cwd         => $zuul_web_src_root,
+    require     => Exec['unpack-zuul-web'],
+    subscribe   => Exec['unpack-zuul-web'],
   }
-  file { '/var/lib/zuul/www/static/styles':
-    ensure  => link,
-    target  => '/opt/zuul/zuul/web/static/styles',
-    require => [File['/var/lib/zuul/www/static'],
-                Vcsrepo['/opt/zuul']],
-  }
+
 }

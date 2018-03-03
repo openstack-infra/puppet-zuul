@@ -74,6 +74,7 @@ disk_limit_per_job=<%= @disk_limit_per_job %>
 
 [web]
 log_config=/etc/zuul/web-logging.conf
+static_path=/opt/zuul-web/content
 <% if @web_listen_address != "" -%>
 listen_address=<%= @web_listen_address %>
 <% end -%>
