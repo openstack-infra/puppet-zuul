@@ -1,17 +1,7 @@
 <VirtualHost *:80>
   ServerName <%= @vhost_name %>
   ServerAdmin <%= @serveradmin %>
-  DocumentRoot /var/lib/zuul/www
 
-  <Directory /var/lib/zuul/www>
-      <IfVersion >= 2.4>
-          Require all granted
-      </IfVersion>
-      <IfVersion < 2.4>
-          Order deny,allow
-          Allow from all
-      </IfVersion>
-  </Directory>
   <Directory /usr/lib/git-core>
       <IfVersion >= 2.4>
           Require all granted
@@ -42,19 +32,8 @@
 <% end %>
 
 <% if @zuulv3 %>
-  RewriteRule ^/connection/(.*) <%= @zuul_web_url %>/connection/$1 [P]
-  RewriteRule ^/status.json <%= @zuul_web_full_url %>/status.json [P]
-  RewriteRule ^/status.html <%= @zuul_web_full_url %>/status.html [P]
-  RewriteRule ^/status <%= @zuul_web_full_url %>/status [P]
-  RewriteRule ^/jobs.json <%= @zuul_web_full_url %>/jobs.json [P]
-  RewriteRule ^/jobs.html <%= @zuul_web_full_url %>/jobs.html [P]
-  RewriteRule ^/jobs <%= @zuul_web_full_url %>/jobs [P]
-  RewriteRule ^/builds.json <%= @zuul_web_full_url %>/builds.json [P]
-  RewriteRule ^/builds.html <%= @zuul_web_full_url %>/builds.html [P]
-  RewriteRule ^/builds <%= @zuul_web_full_url %>/builds [P]
   RewriteRule ^/console-stream <%= @zuul_web_full_url.sub('http://', 'ws://') %>/console-stream [P]
-  RewriteRule ^/stream.html <%= @zuul_web_full_url %>/stream.html [P]
-  RewriteRule ^/(.*).pub$ <%= @zuul_web_full_url %>/$1.pub [P]
+  RewriteRule ^/(.*)$ <%= @zuul_web_full_url %>/$1 [P]
   RewriteRule ^/$ <%= @zuul_web_full_url %>/status.html [P]
 <% end %>
 
@@ -138,19 +117,8 @@
 <% end %>
 
 <% if @zuulv3 %>
-  RewriteRule ^/connection/(.*) <%= @zuul_web_url %>/connection/$1 [P]
-  RewriteRule ^/status.json <%= @zuul_web_full_url %>/status.json [P]
-  RewriteRule ^/status.html <%= @zuul_web_full_url %>/status.html [P]
-  RewriteRule ^/status <%= @zuul_web_full_url %>/status [P]
-  RewriteRule ^/jobs.json <%= @zuul_web_full_url %>/jobs.json [P]
-  RewriteRule ^/jobs.html <%= @zuul_web_full_url %>/jobs.html [P]
-  RewriteRule ^/jobs <%= @zuul_web_full_url %>/jobs [P]
-  RewriteRule ^/builds.json <%= @zuul_web_full_url %>/builds.json [P]
-  RewriteRule ^/builds.html <%= @zuul_web_full_url %>/builds.html [P]
-  RewriteRule ^/builds <%= @zuul_web_full_url %>/builds [P]
   RewriteRule ^/console-stream <%= @zuul_web_full_url.sub('http://', 'ws://') %>/console-stream [P]
-  RewriteRule ^/stream.html <%= @zuul_web_full_url %>/stream.html [P]
-  RewriteRule ^/(.*).pub$ <%= @zuul_web_full_url %>/$1.pub [P]
+  RewriteRule ^/(.*)$ <%= @zuul_web_full_url %>/$1 [P]
   RewriteRule ^/$ <%= @zuul_web_full_url %>/status.html [P]
 <% end %>
 

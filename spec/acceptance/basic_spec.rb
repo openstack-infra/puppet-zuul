@@ -1,3 +1,4 @@
+# coding: utf-8
 require 'puppet-openstack_infra_spec_helper/spec_helper_acceptance'
 
 # https://blog.lorentzca.me/add-custom-matcher-of-serverspec/
@@ -63,13 +64,6 @@ describe 'puppet-zuul module', :if => ['debian', 'ubuntu'].include?(os[:family])
     packages = [
       package('git'),
       package('build-essential'),
-      package('python-lxml'),
-      package('python-yaml'),
-      package('python-paramiko'),
-      package('python-daemon'),
-      package('yui-compressor'),
-      package('python-paste'),
-      package('python-webob')
     ]
     packages << package('apache2') if ['ubuntu', 'debian'].include?(os[:family])
     packages << package('httpd') if ['centos', 'redhat'].include?(os[:family])
@@ -132,25 +126,6 @@ describe 'puppet-zuul module', :if => ['debian', 'ubuntu'].include?(os[:family])
           it { should be_directory }
           it { should be_owned_by 'zuul'}
           it { should be_grouped_into 'zuul'}
-        end
-      end
-    end
-
-    describe 'public_html symlinks' do
-      symlinkies = {
-        file('/var/lib/zuul/www/images') => '/opt/zuul/etc/status/public_html/images',
-        file('/var/lib/zuul/www/index.html') => '/opt/zuul/etc/status/public_html/index.html',
-        file('/var/lib/zuul/www/jquery.zuul.js') => '/opt/zuul/etc/status/public_html/jquery.zuul.js',
-        file('/var/lib/zuul/www/styles') => '/opt/zuul/etc/status/public_html/styles',
-        file('/var/lib/zuul/www/zuul.app.js') => '/opt/zuul/etc/status/public_html/zuul.app.js',
-        file('/var/lib/zuul/www/lib/jquery.graphite.js') => '/opt/graphitejs/jquery.graphite.js',
-        file('/var/lib/zuul/www/lib/bootstrap') => '/opt/twitter-bootstrap/dist',
-      }
-
-      symlinkies.each do |link, destination|
-        describe link do
-          it { should be_symlink }
-          it { should be_linked_to destination }
         end
       end
     end
