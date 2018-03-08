@@ -1,0 +1,9 @@
+Code-Review+2: Clark Boylan <cboylan@sapwetik.org>
+Code-Review+2: Ian Wienand <iwienand@redhat.com>
+Workflow+1: Monty Taylor <mordred@inaugust.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Thu, 08 Mar 2018 14:29:42 +0000
+Reviewed-on: https://review.openstack.org/549608
+Project: openstack-infra/puppet-zuul
+Branch: refs/heads/master
