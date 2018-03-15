@@ -380,6 +380,7 @@ class zuul (
 
     file { $v2_web_dirs:
       ensure => absent,
+      force  => true,
     }
 
   } else {
@@ -417,7 +418,8 @@ class zuul (
     }
 
     file { '/var/lib/zuul/www/bootstrap':
-      ensure => absent
+      ensure => absent,
+      force  => true,
     }
 
     file { '/var/lib/zuul/www/lib/bootstrap':
