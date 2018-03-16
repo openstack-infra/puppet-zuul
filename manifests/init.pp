@@ -368,9 +368,6 @@ class zuul (
   }
 
   if $zuulv3 {
-    package { 'libjs-jquery':
-      ensure => absent,
-    }
     $v2_web_dirs = [
       '/opt/twitter-bootstrap',
       '/opt/jquery-visibility',
