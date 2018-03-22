@@ -40,6 +40,9 @@ class zuul::scheduler (
         provider => $pip_provider,
         require  => Class['pip'],
       }
+      package { 'mysql-client':
+        ensure => present
+      }
   }
 
   if ($::operatingsystem == 'Ubuntu') and ($::operatingsystemrelease >= '16.04') {
