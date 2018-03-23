@@ -1,0 +1,9 @@
+Code-Review+2: James E. Blair <corvus@inaugust.com>
+Code-Review+2: Jens Harbott (frickler) <j.harbott@x-ion.de>
+Workflow+1: Jens Harbott (frickler) <j.harbott@x-ion.de>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Fri, 23 Mar 2018 07:21:58 +0000
+Reviewed-on: https://review.openstack.org/553697
+Project: openstack-infra/puppet-zuul
+Branch: refs/heads/master
