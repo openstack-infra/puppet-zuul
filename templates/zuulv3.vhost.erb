@@ -1,0 +1,68 @@
+<% if @ssl -%>
+<IfModule mod_ssl.c>
+<% end -%>
+<VirtualHost *:<%= @port %>>
+
+<% if @ssl -%>
+  SSLEngine on
+  SSLProtocol All -SSLv2 -SSLv3
+  SSLCertificateFile /etc/ssl/certs/<%= @vhost_name %>.pem
+  SSLCertificateKeyFile /etc/ssl/private/<%= @vhost_name %>.key
+<% if @ssl_chain_file_contents != '' -%>
+  SSLCertificateChainFile /etc/ssl/certs/<%= @vhost_name %>_intermediate.pem
+<% end -%>
+<% end -%>
+
+  ServerName <%= @vhost_name %>
+  ServerAdmin <%= @serveradmin %>
+
+  DocumentRoot <%= @docroot %>
+  <Directory <%= @docroot %>>
+    <IfVersion >= 2.4>
+        Require all granted
+    </IfVersion>
+    <IfVersion < 2.4>
+        Order deny,allow
+        Allow from all
+    </IfVersion>
+  </Directory>
+
+  ErrorLog ${APACHE_LOG_DIR}/<%= @vhost_name %>-error.log
+
+  LogLevel warn
+
+  CustomLog ${APACHE_LOG_DIR}/<%= @vhost_name %>-access.log combined
+
+  RewriteEngine on
+  <% @block_referers.each do |referer| -%>
+  RewriteCond %{HTTP_REFERER} =<%= referer %>
+  RewriteRule ^/status - [F]
+  <% end -%>
+
+  RewriteRule ^/console-stream <%= @zuul_web_full_url.sub('http://', 'ws://') %>/console-stream [P]
+  RewriteRule ^/(.*)$ <%= @zuul_web_full_url %>/$1 [P]
+  RewriteRule ^/$ <%= @zuul_web_full_url %>/status.html [P]
+
+  AddOutputFilterByType DEFLATE application/json
+
+  <IfModule mod_cache.c>
+    CacheDefaultExpire 5
+    <IfModule mod_mem_cache.c>
+      CacheEnable mem /status
+      # 12MByte total cache size.
+      MCacheSize 12288
+      MCacheMaxObjectCount 10
+      MCacheMinObjectSize 1
+      # 8MByte max size per cache entry
+      MCacheMaxObjectSize 8388608
+      MCacheMaxStreamingBuffer 8388608
+    </IfModule>
+    <IfModule mod_cache_disk.c>
+      CacheEnable disk /status
+      CacheRoot /var/cache/apache2/mod_cache_disk
+    </IfModule>
+  </IfModule>
+</VirtualHost>
+<% if @ssl -%>
+</IfModule>
+<% end -%>
