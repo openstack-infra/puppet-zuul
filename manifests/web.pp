@@ -20,6 +20,8 @@ class zuul::web (
   $web_listen_address = '127.0.0.1',
   $web_listen_port = 9000,
   $enable_status_backups = true,
+  $tenant_name = undef,
+  $vhost_name = $::fqdn,
 ) {
 
   service { 'zuul-web':
@@ -116,15 +118,44 @@ class zuul::web (
     }
   }
 
-  file { '/var/lib/zuul/www/static':
-    ensure  => absent,
+  $web_url = "http://${web_listen_address}:${web_listen_port}"
+  if ($tenant_name) {
+    $zuul_web_full_url = "${web_url}/${zuul_tenant_name}"
+  } else {
+    $zuul_web_full_url = $web_url
   }
-
   $zuul_web_root = '/opt/zuul-web'
   $zuul_web_content_root = '/opt/zuul-web/content'
   $zuul_web_src_root = '/opt/zuul-web/source'
   $zuul_web_filename = 'zuul-content-latest.tar.gz'
   $zuul_web_url = "http://tarballs.openstack.org/zuul/${zuul_web_filename}"
+
+    ::httpd::vhost { $vhost_name:
+      port       => 443, # Is required despite not being used.
+      docroot    => 'MEANINGLESS ARGUMENT',
+      priority   => '50',
+      ssl        => $ssl,
+      template   => 'zuul/zuulv3.vhost.erb',
+      vhost_name => $vhost_name,
+    }
+    if ! defined(Httpd::Mod['rewrite']) {
+      httpd::mod { 'rewrite': ensure => present }
+    }
+    if ! defined(Httpd::Mod['proxy']) {
+      httpd::mod { 'proxy': ensure => present }
+    }
+    if ! defined(Httpd::Mod['proxy_http']) {
+      httpd::mod { 'proxy_http': ensure => present }
+    }
+    if ! defined(Httpd::Mod['cache']) {
+      httpd::mod { 'cache': ensure => present }
+    }
+    if !defined(Mod['proxy_wstunnel']) {
+      httpd::mod { 'proxy_wstunnel': ensure => present }
+    }
+    if ! defined(Httpd::Mod['cache_disk']) {
+      httpd::mod { 'cache_disk': ensure => present }
+    }
 
   file { $zuul_web_root:
     ensure  => directory,

@@ -2,16 +2,6 @@
   ServerName <%= @vhost_name %>
   ServerAdmin <%= @serveradmin %>
 
-  <Directory /usr/lib/git-core>
-      <IfVersion >= 2.4>
-          Require all granted
-      </IfVersion>
-      <IfVersion < 2.4>
-          Order deny,allow
-          Allow from all
-      </IfVersion>
-  </Directory>
-
   ErrorLog ${APACHE_LOG_DIR}/<%= @vhost_name %>-error.log
 
   LogLevel warn
@@ -22,27 +12,18 @@
   <% @block_referers.each do |referer| -%>
   RewriteCond %{HTTP_REFERER} =<%= referer %>
   RewriteRule ^/status - [F]
-  RewriteCond %{HTTP_REFERER} =<%= referer %>
-  RewriteRule ^/status.json - [F]
   <% end -%>
 
-  RewriteRule ^/status.json$ <%= @zuul_status_url %>/status.json [P]
-  RewriteRule ^/status/(.*) <%= @zuul_status_url %>/status/$1 [P]
+  RewriteRule ^/console-stream <%= @zuul_web_full_url.sub('http://', 'ws://') %>/console-stream [P]
+  RewriteRule ^/(.*)$ <%= @zuul_web_full_url %>/$1 [P]
+  RewriteRule ^/$ <%= @zuul_web_full_url %>/status.html [P]
 
   AddOutputFilterByType DEFLATE application/json
-
-  SetEnv GIT_PROJECT_ROOT /var/lib/zuul/git/
-  SetEnv GIT_HTTP_EXPORT_ALL
-
-  AliasMatch ^/p/(.*/objects/[0-9a-f]{2}/[0-9a-f]{38})$ /var/lib/zuul/git/$1
-  AliasMatch ^/p/(.*/objects/pack/pack-[0-9a-f]{40}.(pack|idx))$ /var/lib/zuul/git/$1
-  ScriptAlias /p/ /usr/lib/git-core/git-http-backend/
 
   <IfModule mod_cache.c>
     CacheDefaultExpire 5
     <IfModule mod_mem_cache.c>
       CacheEnable mem /status
-      CacheEnable mem /status.json
       # 12MByte total cache size.
       MCacheSize 12288
       MCacheMaxObjectCount 10
@@ -53,7 +34,6 @@
     </IfModule>
     <IfModule mod_cache_disk.c>
       CacheEnable disk /status
-      CacheEnable disk /status.json
       CacheRoot /var/cache/apache2/mod_cache_disk
     </IfModule>
   </IfModule>
@@ -92,27 +72,18 @@
   <% @block_referers.each do |referer| -%>
   RewriteCond %{HTTP_REFERER} =<%= referer %>
   RewriteRule ^/status - [F]
-  RewriteCond %{HTTP_REFERER} =<%= referer %>
-  RewriteRule ^/status.json - [F]
   <% end -%>
 
-  RewriteRule ^/status.json$ <%= @zuul_status_url %>/status.json [P]
-  RewriteRule ^/status/(.*) <%= @zuul_status_url %>/status/$1 [P]
+  RewriteRule ^/console-stream <%= @zuul_web_full_url.sub('http://', 'ws://') %>/console-stream [P]
+  RewriteRule ^/(.*)$ <%= @zuul_web_full_url %>/$1 [P]
+  RewriteRule ^/$ <%= @zuul_web_full_url %>/status.html [P]
 
   AddOutputFilterByType DEFLATE application/json
-
-  SetEnv GIT_PROJECT_ROOT /var/lib/zuul/git/
-  SetEnv GIT_HTTP_EXPORT_ALL
-
-  AliasMatch ^/p/(.*/objects/[0-9a-f]{2}/[0-9a-f]{38})$ /var/lib/zuul/git/$1
-  AliasMatch ^/p/(.*/objects/pack/pack-[0-9a-f]{40}.(pack|idx))$ /var/lib/zuul/git/$1
-  ScriptAlias /p/ /usr/lib/git-core/git-http-backend/
 
   <IfModule mod_cache.c>
     CacheDefaultExpire 5
     <IfModule mod_mem_cache.c>
       CacheEnable mem /status
-      CacheEnable mem /status.json
       # 12MByte total cache size.
       MCacheSize 12288
       MCacheMaxObjectCount 10
@@ -123,7 +94,6 @@
     </IfModule>
     <IfModule mod_cache_disk.c>
       CacheEnable disk /status
-      CacheEnable disk /status.json
       CacheRoot /var/cache/apache2/mod_cache_disk
     </IfModule>
   </IfModule>

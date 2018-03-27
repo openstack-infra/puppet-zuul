@@ -105,12 +105,6 @@ class zuul (
     $pip_command = 'pip'
   }
 
-  if ($zuul_tenant_name) {
-    $zuul_web_full_url = "${zuul_web_url}/${zuul_tenant_name}"
-  } else {
-    $zuul_web_full_url = $zuul_web_url
-  }
-
   $packages = [
     'libffi-dev',
     'libssl-dev',
@@ -625,47 +619,45 @@ class zuul (
     }
   }
 
-  ::httpd::vhost { $vhost_name:
-    port       => 443, # Is required despite not being used.
-    docroot    => 'MEANINGLESS ARGUMENT',
-    priority   => '50',
-    ssl        => $ssl,
-    template   => 'zuul/zuul.vhost.erb',
-    vhost_name => $vhost_name,
-  }
-  if ! defined(Httpd::Mod['rewrite']) {
-    httpd::mod { 'rewrite': ensure => present }
-  }
-  if ! defined(Httpd::Mod['proxy']) {
-    httpd::mod { 'proxy': ensure => present }
-  }
-  if ! defined(Httpd::Mod['proxy_http']) {
-    httpd::mod { 'proxy_http': ensure => present }
-  }
-  if ! defined(Httpd::Mod['cache']) {
-    httpd::mod { 'cache': ensure => present }
-  }
-  if ! defined(Httpd::Mod['cgid']) {
-    httpd::mod { 'cgid': ensure => present }
-  }
-  if !defined(Mod['proxy_wstunnel']) {
-    httpd::mod { 'proxy_wstunnel': ensure => present }
-  }
+  if ! $zuulv3 {
+    ::httpd::vhost { $vhost_name:
+      port       => 443, # Is required despite not being used.
+      docroot    => 'MEANINGLESS ARGUMENT',
+      priority   => '50',
+      ssl        => $ssl,
+      template   => 'zuul/zuul.vhost.erb',
+      vhost_name => $vhost_name,
+    }
+    if ! defined(Httpd::Mod['rewrite']) {
+      httpd::mod { 'rewrite': ensure => present }
+    }
+    if ! defined(Httpd::Mod['proxy']) {
+      httpd::mod { 'proxy': ensure => present }
+    }
+    if ! defined(Httpd::Mod['proxy_http']) {
+      httpd::mod { 'proxy_http': ensure => present }
+    }
+    if ! defined(Httpd::Mod['cache']) {
+      httpd::mod { 'cache': ensure => present }
+    }
+    if ! defined(Httpd::Mod['cgid']) {
+      httpd::mod { 'cgid': ensure => present }
+    }
 
-  case $::lsbdistcodename {
-    'precise': {
-      if ! defined(Httpd::Mod['mem_cache']) {
-        httpd::mod { 'mem_cache': ensure => present }
+    case $::lsbdistcodename {
+      'precise': {
+        if ! defined(Httpd::Mod['mem_cache']) {
+          httpd::mod { 'mem_cache': ensure => present }
+        }
+        if ! defined(Httpd::Mod['version']) {
+          httpd::mod { 'version': ensure => present }
+        }
       }
-      if ! defined(Httpd::Mod['version']) {
-        httpd::mod { 'version': ensure => present }
+      default: {
+        if ! defined(Httpd::Mod['cache_disk']) {
+          httpd::mod { 'cache_disk': ensure => present }
+        }
       }
     }
-    default: {
-      if ! defined(Httpd::Mod['cache_disk']) {
-        httpd::mod { 'cache_disk': ensure => present }
-      }
-    }
-  }
 
 }
