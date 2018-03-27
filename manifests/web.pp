@@ -20,6 +20,11 @@ class zuul::web (
   $web_listen_address = '127.0.0.1',
   $web_listen_port = 9000,
   $enable_status_backups = true,
+  $tenant_name = undef,
+  $vhost_name = $::fqdn,
+  $ssl_cert_file_contents = '',
+  $ssl_key_file_contents = '',
+  $ssl_chain_file_contents = '',
 ) {
 
   service { 'zuul-web':
@@ -28,6 +33,7 @@ class zuul::web (
     enable     => true,
     hasrestart => true,
     require    => [File['/etc/init.d/zuul-web'],
+                  File['/etc/default/zuul-web'],
                   Class['zuul::systemd_reload']]
   }
 
@@ -71,6 +77,12 @@ class zuul::web (
     require => Service['zuul-web'],
   }
 
+  file { '/etc/default/zuul-web':
+    ensure  => present,
+    mode    => '0444',
+    content => "PIDFILE=/var/run/zuul/web.pid\n",
+  }
+
   if !defined(Package['curl']) {
     package { 'curl':
       ensure => present
@@ -90,7 +102,7 @@ class zuul::web (
     # We are downloading this file at a location served by the vhost so that we
     # can query it easily should the need arise.
     # If the status.json is unavailable for download, no new files are created.
-    if $zuul::proxy_ssl_cert_file_contents != '' {
+    if $ssl_cert_file_contents != '' {
       $status = "https://${zuul::vhost_name}/status"
     } else {
       $status = "http://${zuul::vhost_name}/status"
@@ -116,10 +128,59 @@ class zuul::web (
     }
   }
 
-  file { '/var/lib/zuul/www/static':
-    ensure  => absent,
+  if $ssl_cert_file_contents == '' {
+    $ssl = false
+  } else {
+    $ssl = true
+    file { '/etc/ssl/certs':
+      ensure => directory,
+      owner  => 'root',
+      group  => 'root',
+      mode   => '0755',
+    }
+    file { '/etc/ssl/private':
+      ensure => directory,
+      owner  => 'root',
+      group  => 'root',
+      mode   => '0700',
+    }
+    file { "/etc/ssl/certs/${vhost_name}.pem":
+      ensure  => present,
+      owner   => 'root',
+      group   => 'root',
+      mode    => '0644',
+      content => $proxy_ssl_cert_file_contents,
+      require => File['/etc/ssl/certs'],
+      before  => Httpd::Vhost[$vhost_name],
+    }
+    file { "/etc/ssl/private/${vhost_name}.key":
+      ensure  => present,
+      owner   => 'root',
+      group   => 'root',
+      mode    => '0600',
+      content => $proxy_ssl_key_file_contents,
+      require => File['/etc/ssl/private'],
+      before  => Httpd::Vhost[$vhost_name],
+    }
+    if $proxy_ssl_chain_file_contents != '' {
+      file { "/etc/ssl/certs/${vhost_name}_intermediate.pem":
+        ensure  => present,
+        owner   => 'root',
+        group   => 'root',
+        mode    => '0644',
+        content => $proxy_ssl_chain_file_contents,
+        require => File['/etc/ssl/certs'],
+        before  => Httpd::Vhost[$vhost_name],
+      }
+    }
   }
 
+  $web_url = "http://${web_listen_address}:${web_listen_port}"
+  if ($tenant_name) {
+    $zuul_web_full_url = "${web_url}/${zuul_tenant_name}"
+  } else {
+    $zuul_web_full_url = $web_url
+  }
   $zuul_web_root = '/opt/zuul-web'
   $zuul_web_content_root = '/opt/zuul-web/content'
   $zuul_web_src_root = '/opt/zuul-web/source'
@@ -190,6 +251,43 @@ class zuul::web (
     cwd         => $zuul_web_src_root,
     require     => Exec['unpack-zuul-web'],
     subscribe   => Exec['unpack-zuul-web'],
+  }
+
+  ::httpd::vhost { $vhost_name:
+    port       => 80,
+    docroot    => $zuul_web_content_root,
+    priority   => '50',
+    ssl        => true,
+    template   => 'zuul/zuulv3.vhost.erb',
+    vhost_name => $vhost_name,
+  }
+  if $ssl {
+    ::httpd::vhost { "${vhost_name}-ssl":
+      port       => 443,
+      docroot    => $zuul_web_content_root,
+      priority   => '50',
+      ssl        => true,
+      template   => 'zuul/zuulv3.vhost.erb',
+      vhost_name => $vhost_name,
+    }
+  }
+  if ! defined(Httpd::Mod['rewrite']) {
+    httpd::mod { 'rewrite': ensure => present }
+  }
+  if ! defined(Httpd::Mod['proxy']) {
+    httpd::mod { 'proxy': ensure => present }
+  }
+  if ! defined(Httpd::Mod['proxy_http']) {
+    httpd::mod { 'proxy_http': ensure => present }
+  }
+  if ! defined(Httpd::Mod['cache']) {
+    httpd::mod { 'cache': ensure => present }
+  }
+  if !defined(Mod['proxy_wstunnel']) {
+    httpd::mod { 'proxy_wstunnel': ensure => present }
+  }
+  if ! defined(Httpd::Mod['cache_disk']) {
+    httpd::mod { 'cache_disk': ensure => present }
   }
 
 }
