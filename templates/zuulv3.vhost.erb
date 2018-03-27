@@ -56,8 +56,7 @@
   <IfModule mod_cache.c>
     CacheDefaultExpire 5
     <IfModule mod_mem_cache.c>
-      # TODO: Should we cache the rest of the API too?
-      CacheEnable mem /api/status
+      CacheEnable mem /api
       # 12MByte total cache size.
       MCacheSize 12288
       MCacheMaxObjectCount 10
@@ -67,7 +66,7 @@
       MCacheMaxStreamingBuffer 8388608
     </IfModule>
     <IfModule mod_cache_disk.c>
-      CacheEnable disk /api/status
+      CacheEnable disk /api
       CacheRoot /var/cache/apache2/mod_cache_disk
     </IfModule>
   </IfModule>
