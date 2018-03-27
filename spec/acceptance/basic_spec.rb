@@ -67,6 +67,8 @@ describe 'puppet-zuul module', :if => ['debian', 'ubuntu'].include?(os[:family])
     ]
     packages << package('apache2') if ['ubuntu', 'debian'].include?(os[:family])
     packages << package('httpd') if ['centos', 'redhat'].include?(os[:family])
+    shell('ls /etc/apache2/sites-enabled/')
+    shell('cat /etc/apache2/sites-enabled/*')
 
     packages.each do |package|
       describe package do

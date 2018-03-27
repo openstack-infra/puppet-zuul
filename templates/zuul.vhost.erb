@@ -1,15 +1,25 @@
 <VirtualHost *:80>
   ServerName <%= @vhost_name %>
   ServerAdmin <%= @serveradmin %>
+  DocumentRoot /var/lib/zuul/www
 
+  <Directory /var/lib/zuul/www>
+    <IfVersion >= 2.4>
+        Require all granted
+    </IfVersion>
+    <IfVersion < 2.4>
+        Order deny,allow
+        Allow from all
+    </IfVersion>
+  </Directory>
   <Directory /usr/lib/git-core>
-      <IfVersion >= 2.4>
-          Require all granted
-      </IfVersion>
-      <IfVersion < 2.4>
-          Order deny,allow
-          Allow from all
-      </IfVersion>
+    <IfVersion >= 2.4>
+        Require all granted
+    </IfVersion>
+    <IfVersion < 2.4>
+        Order deny,allow
+        Allow from all
+    </IfVersion>
   </Directory>
 
   ErrorLog ${APACHE_LOG_DIR}/<%= @vhost_name %>-error.log
@@ -26,16 +36,8 @@
   RewriteRule ^/status.json - [F]
   <% end -%>
 
-<% unless @zuulv3 %>
   RewriteRule ^/status.json$ <%= @zuul_status_url %>/status.json [P]
   RewriteRule ^/status/(.*) <%= @zuul_status_url %>/status/$1 [P]
-<% end %>
-
-<% if @zuulv3 %>
-  RewriteRule ^/console-stream <%= @zuul_web_full_url.sub('http://', 'ws://') %>/console-stream [P]
-  RewriteRule ^/(.*)$ <%= @zuul_web_full_url %>/$1 [P]
-  RewriteRule ^/$ <%= @zuul_web_full_url %>/status.html [P]
-<% end %>
 
   AddOutputFilterByType DEFLATE application/json
 
@@ -49,12 +51,8 @@
   <IfModule mod_cache.c>
     CacheDefaultExpire 5
     <IfModule mod_mem_cache.c>
-<% if @zuulv3 %>
       CacheEnable mem /status
       CacheEnable mem /status.json
-<% else %>
-      CacheEnable mem /status.json
-<% end %>
       # 12MByte total cache size.
       MCacheSize 12288
       MCacheMaxObjectCount 10
@@ -64,12 +62,8 @@
       MCacheMaxStreamingBuffer 8388608
     </IfModule>
     <IfModule mod_cache_disk.c>
-<% if @zuulv3 %>
       CacheEnable disk /status
       CacheEnable disk /status.json
-<% else %>
-      CacheEnable disk /status.json
-<% end %>
       CacheRoot /var/cache/apache2/mod_cache_disk
     </IfModule>
   </IfModule>
@@ -90,12 +84,22 @@
 <% end %>
 
   <Directory /var/lib/zuul/www>
-    Allow from all
-    Satisfy Any
+    <IfVersion >= 2.4>
+        Require all granted
+    </IfVersion>
+    <IfVersion < 2.4>
+        Order deny,allow
+        Allow from all
+    </IfVersion>
   </Directory>
   <Directory /usr/lib/git-core>
-    Allow from all
-    Satisfy Any
+    <IfVersion >= 2.4>
+        Require all granted
+    </IfVersion>
+    <IfVersion < 2.4>
+        Order deny,allow
+        Allow from all
+    </IfVersion>
   </Directory>
 
   ErrorLog ${APACHE_LOG_DIR}/<%= @vhost_name %>-error.log
@@ -111,16 +115,9 @@
   RewriteCond %{HTTP_REFERER} =<%= referer %>
   RewriteRule ^/status.json - [F]
   <% end -%>
-<% unless @zuulv3 %>
+
   RewriteRule ^/status.json$ <%= @zuul_status_url %>/status.json [P]
   RewriteRule ^/status/(.*) <%= @zuul_status_url %>/status/$1 [P]
-<% end %>
-
-<% if @zuulv3 %>
-  RewriteRule ^/console-stream <%= @zuul_web_full_url.sub('http://', 'ws://') %>/console-stream [P]
-  RewriteRule ^/(.*)$ <%= @zuul_web_full_url %>/$1 [P]
-  RewriteRule ^/$ <%= @zuul_web_full_url %>/status.html [P]
-<% end %>
 
   AddOutputFilterByType DEFLATE application/json
 
@@ -134,12 +131,8 @@
   <IfModule mod_cache.c>
     CacheDefaultExpire 5
     <IfModule mod_mem_cache.c>
-<% if @zuulv3 %>
       CacheEnable mem /status
       CacheEnable mem /status.json
-<% else %>
-      CacheEnable mem /status.json
-<% end %>
       # 12MByte total cache size.
       MCacheSize 12288
       MCacheMaxObjectCount 10
@@ -149,12 +142,8 @@
       MCacheMaxStreamingBuffer 8388608
     </IfModule>
     <IfModule mod_cache_disk.c>
-<% if @zuulv3 %>
       CacheEnable disk /status
       CacheEnable disk /status.json
-<% else %>
-      CacheEnable disk /status.json
-<% end %>
       CacheRoot /var/cache/apache2/mod_cache_disk
     </IfModule>
   </IfModule>
