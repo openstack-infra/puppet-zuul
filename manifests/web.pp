@@ -20,6 +20,13 @@ class zuul::web (
   $web_listen_address = '127.0.0.1',
   $web_listen_port = 9000,
   $enable_status_backups = true,
+  $tenant_name = '',
+  $vhost_name = $::fqdn,
+  $ssl_cert_file_contents = '',
+  $ssl_key_file_contents = '',
+  $ssl_chain_file_contents = '',
+  $block_referers = [],
+  $serveradmin = "webmaster@${::fqdn}",
 ) {
 
   service { 'zuul-web':
