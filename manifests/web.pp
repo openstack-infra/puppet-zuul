@@ -20,7 +20,7 @@ class zuul::web (
   $web_listen_address = '127.0.0.1',
   $web_listen_port = 9000,
   $enable_status_backups = true,
-  $tenant_name = undef,
+  $tenant_name = '',
   $vhost_name = $::fqdn,
   $ssl_cert_file_contents = '',
   $ssl_key_file_contents = '',
@@ -103,9 +103,9 @@ class zuul::web (
     # can query it easily should the need arise.
     # If the status.json is unavailable for download, no new files are created.
     if $ssl_cert_file_contents != '' {
-      $status = "https://${zuul::vhost_name}/status"
+      $status = "https://${zuul::vhost_name}/api/status"
     } else {
-      $status = "http://${zuul::vhost_name}/status"
+      $status = "http://${zuul::vhost_name}/api/status"
     }
     cron { 'zuul_scheduler_status_backup':
       user    => 'root',
@@ -176,11 +176,6 @@ class zuul::web (
   }
 
   $web_url = "http://${web_listen_address}:${web_listen_port}"
-  if ($tenant_name) {
-    $zuul_web_full_url = "${web_url}/${tenant_name}"
-  } else {
-    $zuul_web_full_url = $web_url
-  }
   $zuul_web_root = '/opt/zuul-web'
   $zuul_web_content_root = '/opt/zuul-web/content'
   $zuul_web_src_root = '/opt/zuul-web/source'
