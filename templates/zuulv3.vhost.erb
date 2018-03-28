@@ -48,7 +48,7 @@
   RewriteRule ^/api/(.*)$ <%= @web_url %>/api/tenant/<%= @tenant_name %>/$1 [P]
   <% else -%>
   RewriteRule ^/$ /tenants.html [L]
-  RewriteRule ^/t/(.*) /$1 [L]
+  RewriteRule ^/t/.*/(.*) /$1 [L]
   RewriteRule ^/api/tenant/(.*)/console-stream <%= @websocket_url %>/api/tenant/$1/console-stream [P]
   RewriteRule ^/api/(.*)$ <%= @web_url %>/api/$1 [P]
   <% end -%>
