@@ -161,6 +161,14 @@ class zuul (
         ensure => present,
       }
     }
+
+  } else {
+    # Needed for fb-re2
+    if ! defined (Package['libre2-dev']) {
+      package { 'libre2-dev':
+        ensure => present,
+      }
+    }
   }
 
   user { 'zuul':
