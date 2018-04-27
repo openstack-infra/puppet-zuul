@@ -281,7 +281,7 @@ class zuul::web (
   if ! defined(Httpd::Mod['cache']) {
     httpd::mod { 'cache': ensure => present }
   }
-  if !defined(Mod['proxy_wstunnel']) {
+  if !defined(Httpd::Mod['proxy_wstunnel']) {
     httpd::mod { 'proxy_wstunnel': ensure => present }
   }
   if ! defined(Httpd::Mod['cache_disk']) {
