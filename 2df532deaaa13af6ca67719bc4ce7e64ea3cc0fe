@@ -1,0 +1,9 @@
+Code-Review+2: Joshua Hesketh <josh@nitrotech.org>
+Code-Review+2: Clark Boylan <cboylan@sapwetik.org>
+Workflow+1: Clark Boylan <cboylan@sapwetik.org>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Tue, 05 Jun 2018 22:22:16 +0000
+Reviewed-on: https://review.openstack.org/564577
+Project: openstack-infra/puppet-zuul
+Branch: refs/heads/master
