@@ -71,6 +71,7 @@
     <IfModule mod_cache_disk.c>
       CacheEnable disk /api/status
       CacheRoot /var/cache/apache2/mod_cache_disk
+      CacheMaxFileSize 2000000
     </IfModule>
   </IfModule>
 </VirtualHost>
