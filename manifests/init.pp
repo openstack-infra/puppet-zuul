@@ -138,14 +138,6 @@ class zuul (
       }
     }
 
-    # A lot of things need yaml, be conservative requiring this package to avoid
-    # conflicts with other modules.
-    if ! defined(Package['python-yaml']) {
-      package { 'python-yaml':
-        ensure => present,
-      }
-    }
-
     if ! defined(Package['python-paramiko']) {
       package { 'python-paramiko':
         ensure   => present,
@@ -212,7 +204,6 @@ class zuul (
     Exec['install_zuul'] -> Package['python-daemon']
     Exec['install_zuul'] -> Package['python-lxml']
     Exec['install_zuul'] -> Package['python-paramiko']
-    Exec['install_zuul'] -> Package['python-yaml']
     Exec['install_zuul'] -> Package['yui-compressor']
   }
 
