@@ -116,6 +116,14 @@ class zuul (
     ensure => present,
   }
 
+  # NOTE(pabelanger): Due to pip10, we can no longer uninstall system python
+  # packages. Moving forward, we should consider installing zuul into a
+  # virtualenv, or container.
+  package { 'python3-yaml':
+    ensure => absent,
+    before => Exec['install_zuul'],
+  }
+
   # yappi, pyzmq requires this to build
   if ! defined(Package['build-essential']) {
     package { 'build-essential':
