@@ -78,9 +78,6 @@ do_stop()
     start-stop-daemon --stop --signal 9 --pidfile $PIDFILE
     RETVAL="$?"
     [ "$RETVAL" = 2 ] && return 2
-    if [ -f "$PIDFILE" ] ; then
-        rm -f $PIDFILE
-    fi
     return "$RETVAL"
 }
 

@@ -72,9 +72,6 @@ do_start()
 do_stop()
 {
     $DAEMON stop
-    if [ -f "$PIDFILE" ] ; then
-        rm -f $PIDFILE
-    fi
     return 0
 }
 
