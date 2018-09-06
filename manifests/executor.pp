@@ -58,6 +58,13 @@ class zuul::executor (
     require  => Class['pip'],
   }
 
+  # ansible dependency for docker modules
+  package { 'docker-py':
+    ensure   => latest,
+    provider => 'pip3',
+    require  => Class['pip'],
+  }
+
   if ($::operatingsystem == 'Ubuntu') and ($::operatingsystemrelease >= '16.04') {
     # This is a hack to make sure that systemd is aware of the new service
     # before we attempt to start it.
