@@ -40,23 +40,18 @@
   <% end -%>
 
   <% if scope.lookupvar('::zuul::web::tenant_name') != '' -%>
-  RewriteRule ^/$ /status [L]
+  RewriteRule ^/$ /status.html [L]
   # Backwards compat for old status urls. Should be removed in a few weeks.
-  RewriteRule ^/status$ <%= scope.lookupvar('::zuul::web::web_url') %>/api/tenant/<%= scope.lookupvar('::zuul::web::tenant_name') %>/status [P,L]
-  RewriteRule ^/api/connection/(.*)$ <%= scope.lookupvar('::zuul::web::web_url') %>/api/connection/$1 [P,L]
-  RewriteRule ^/api/console-stream <%= scope.lookupvar('::zuul::web::websocket_url') %>/api/tenant/<%= scope.lookupvar('::zuul::web::tenant_name') %>/console-stream [P,L]
-  RewriteRule ^/api/(.*)$ <%= scope.lookupvar('::zuul::web::web_url') %>/api/tenant/<%= scope.lookupvar('::zuul::web::tenant_name') %>/$1 [P,L]
+  RewriteRule ^/status$ <%= scope.lookupvar('::zuul::web::web_url') %>/api/tenant/<%= scope.lookupvar('::zuul::web::tenant_name') %>/status [P]
+  RewriteRule ^/api/connection/(.*)$ <%= scope.lookupvar('::zuul::web::web_url') %>/api/connection/$1 [P]
+  RewriteRule ^/api/console-stream <%= scope.lookupvar('::zuul::web::websocket_url') %>/api/tenant/<%= scope.lookupvar('::zuul::web::tenant_name') %>/console-stream [P]
+  RewriteRule ^/api/(.*)$ <%= scope.lookupvar('::zuul::web::web_url') %>/api/tenant/<%= scope.lookupvar('::zuul::web::tenant_name') %>/$1 [P]
   <% else -%>
-  RewriteRule ^/$ /tenants [L]
+  RewriteRule ^/$ /tenants.html [L]
   RewriteRule ^/t/(.*) /$1 [L]
-  RewriteRule ^/api/tenant/(.*)/console-stream <%= scope.lookupvar('::zuul::web::websocket_url') %>/api/tenant/$1/console-stream [P,L]
-  RewriteRule ^/api/(.*)$ <%= scope.lookupvar('::zuul::web::web_url') %>/api/$1 [P,L]
+  RewriteRule ^/api/tenant/(.*)/console-stream <%= scope.lookupvar('::zuul::web::websocket_url') %>/api/tenant/$1/console-stream [P]
+  RewriteRule ^/api/(.*)$ <%= scope.lookupvar('::zuul::web::web_url') %>/api/$1 [P]
   <% end -%>
-
-  # Rewrite HTML5 route to index.html
-  RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteCond %{REQUEST_FILENAME} !-d
-  RewriteRule . /index.html [L]
 
   AddOutputFilterByType DEFLATE application/json
 
