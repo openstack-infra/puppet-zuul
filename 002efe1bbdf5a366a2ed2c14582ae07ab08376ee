@@ -1,0 +1,9 @@
+Code-Review+2: James E. Blair <corvus@inaugust.com>
+Code-Review+2: Jeremy Stanley <fungi@yuggoth.org>
+Workflow+1: Jeremy Stanley <fungi@yuggoth.org>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Mon, 08 Oct 2018 22:16:43 +0000
+Reviewed-on: https://review.openstack.org/608778
+Project: openstack-infra/puppet-zuul
+Branch: refs/heads/master
