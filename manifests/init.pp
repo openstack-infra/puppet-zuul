@@ -32,6 +32,7 @@ class zuul (
   $zookeeper_hosts = '127.0.0.1:2181',
   $zookeeper_session_timeout = undef,
   $tenant_file_name = 'main.yaml',
+  $relative_priority = 'false',
   $url_pattern = '',
   $status_url = "https://${::fqdn}/",
   $zuul_status_url = 'http://127.0.0.1:8001',
