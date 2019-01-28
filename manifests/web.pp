@@ -27,7 +27,53 @@ class zuul::web (
   $ssl_chain_file_contents = '',
   $block_referers = [],
   $serveradmin = "webmaster@${::fqdn}",
+  # New sets of hashes on which create resources will be run.
+  # If not supplied the legacy parameters above will be used to
+  # construct these hashes.
+  $vhosts = {},
+  $vhosts_flags = {},
+  $vhosts_ssl = {},
 ) {
+
+  #TODO create_resources
+  if $vhosts == {} {
+    if $ssl_cert_file_contents == '' {
+      $vhost_port = 80
+      $use_ssl = false
+      $vhosts_ssl_int = {}
+    } else {
+      $vhost_port = 443
+      $use_ssl = true
+      $vhosts_ssl_int = {
+        "$vhost_name" => {
+          ssl_cert_file_contents  => $ssl_cert_file_contents,
+          ssl_key_file_contents   => $ssl_key_file_contents,
+          ssl_chain_file_contents => $ssl_chain_file_contents,
+        }
+      }
+    }
+    $vhosts_int = {
+      "$vhost_name" => {
+        port       => $vhost_port,
+        docroot    => $zuul_web_content_root,
+        priority   => '50',
+        ssl        => $use_ssl,
+        template   => 'zuul/zuulv3.vhost.erb',
+        vhost_name => $vhost_name,
+      }
+    }
+    $vhosts_flags_int = {
+      "$vhost_name" => {
+        'tenant_name' => $tenant_name,
+        'ssl'         => $use_ssl,
+      }
+    }
+  }
+  else {
+    $vhosts_ssl_int = $vhosts_ssl
+    $vhosts_int = $vhosts
+    $vhosts_flags_int = $vhosts_flags
+  }
 
   service { 'zuul-web':
     ensure     => $ensure,
@@ -97,84 +143,13 @@ class zuul::web (
   }
 
   if $enable_status_backups {
-    # Minutes, hours, days, etc are not specified here because we are
-    # interested in running this *every minute*.
-    # This is a mean of backing up status.json periodically in order to provide
-    # a mean of restoring lost scheduler queues if need be.
-    # We are downloading this file at a location served by the vhost so that we
-    # can query it easily should the need arise.
-    # If the status.json is unavailable for download, no new files are created.
-    if $ssl_cert_file_contents != '' {
-      $status = "https://${vhost_name}/api/status"
-    } else {
-      $status = "http://${vhost_name}/api/status"
-    }
-    cron { 'zuul_scheduler_status_backup':
-      user    => 'root',
-      command => "timeout -k 5 10 curl ${status} -o /var/lib/zuul/backup/status_$(date +\\%s).json 2>/dev/null",
-      require => [Package['curl'],
-                  User['zuul'],
-                  File['/var/lib/zuul/backup']],
-    }
-    # Rotate backups and keep no more than 120 files -- or 2 hours worth of
-    # backup if Zuul has 100% uptime.
-    # We're not basing the rotation on time because the scheduler/web service
-    # could be down for an extended period of time.
-    # This is ran hourly so technically up to ~3 hours worth of backups will
-    # be kept.
-    cron { 'zuul_scheduler_status_prune':
-      user    => 'root',
-      minute  => '0',
-      command => 'flock -n /var/run/status_prune.lock ls -dt -1 /var/lib/zuul/backup/* |sed -e "1,120d" |xargs rm -f',
-      require => Cron['zuul_scheduler_status_backup'],
-    }
+    create_resources(zuul::status_backups, $vhosts_flags_int)
   }
 
   if $ssl_cert_file_contents == '' {
     $use_ssl = false
   } else {
     $use_ssl = true
-    file { '/etc/ssl/certs':
-      ensure => directory,
-      owner  => 'root',
-      group  => 'root',
-      mode   => '0755',
-    }
-    file { '/etc/ssl/private':
-      ensure => directory,
-      owner  => 'root',
-      group  => 'root',
-      mode   => '0700',
-    }
-    file { "/etc/ssl/certs/${vhost_name}.pem":
-      ensure  => present,
-      owner   => 'root',
-      group   => 'root',
-      mode    => '0644',
-      content => $ssl_cert_file_contents,
-      require => File['/etc/ssl/certs'],
-      before  => Httpd::Vhost[$vhost_name],
-    }
-    file { "/etc/ssl/private/${vhost_name}.key":
-      ensure  => present,
-      owner   => 'root',
-      group   => 'root',
-      mode    => '0600',
-      content => $ssl_key_file_contents,
-      require => File['/etc/ssl/private'],
-      before  => Httpd::Vhost[$vhost_name],
-    }
-    if $ssl_chain_file_contents != '' {
-      file { "/etc/ssl/certs/${vhost_name}_intermediate.pem":
-        ensure  => present,
-        owner   => 'root',
-        group   => 'root',
-        mode    => '0644',
-        content => $ssl_chain_file_contents,
-        require => File['/etc/ssl/certs'],
-        before  => Httpd::Vhost[$vhost_name],
-      }
-    }
   }
 
   $web_url = "http://${web_listen_address}:${web_listen_port}"
@@ -251,24 +226,6 @@ class zuul::web (
     subscribe   => Exec['unpack-zuul-web'],
   }
 
-  ::httpd::vhost { $vhost_name:
-    port       => 80,
-    docroot    => $zuul_web_content_root,
-    priority   => '50',
-    ssl        => false,
-    template   => 'zuul/zuulv3.vhost.erb',
-    vhost_name => $vhost_name,
-  }
-  if $use_ssl {
-    ::httpd::vhost { "${vhost_name}-ssl":
-      port       => 443,
-      docroot    => $zuul_web_content_root,
-      priority   => '50',
-      ssl        => true,
-      template   => 'zuul/zuulv3.vhost.erb',
-      vhost_name => $vhost_name,
-    }
-  }
   if ! defined(Httpd::Mod['rewrite']) {
     httpd::mod { 'rewrite': ensure => present }
   }
@@ -288,4 +245,20 @@ class zuul::web (
     httpd::mod { 'cache_disk': ensure => present }
   }
 
+  if $vhosts_ssl_int != {} {
+    file { '/etc/ssl/certs':
+      ensure => directory,
+      owner  => 'root',
+      group  => 'root',
+      mode   => '0755',
+    }
+    file { '/etc/ssl/private':
+      ensure => directory,
+      owner  => 'root',
+      group  => 'root',
+      mode   => '0700',
+    }
+    create_resources(zuul::ssl_files, $vhosts_ssl_int)
+  }
+  create_resources(httpd::vhost, $vhosts_int)
 }
