@@ -1,0 +1,10 @@
+Code-Review+1: Tobias Henkel <tobias.henkel@bmw.de>
+Code-Review+2: James E. Blair <corvus@inaugust.com>
+Code-Review+2: Jeremy Stanley <fungi@yuggoth.org>
+Workflow+1: Jeremy Stanley <fungi@yuggoth.org>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Tue, 12 Feb 2019 23:57:33 +0000
+Reviewed-on: https://review.openstack.org/636454
+Project: openstack-infra/puppet-zuul
+Branch: refs/heads/master
