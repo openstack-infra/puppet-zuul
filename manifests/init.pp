@@ -503,7 +503,7 @@ class zuul (
     file { '/etc/default/zuul-executor':
       ensure  => present,
       mode    => '0444',
-      content => "PIDFILE=/var/run/zuul/executor.pid\n",
+      content => "PIDFILE=/var/run/zuul/executor.pid\nexport LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libjemalloc.so.1\n",
     }
 
     file { '/etc/default/zuul-scheduler':

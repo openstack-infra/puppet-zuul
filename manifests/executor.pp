@@ -33,6 +33,13 @@ class zuul::executor (
     ],
   }
 
+  # Alternative malloc implementation with better packing performance
+  if ! defined(Package['libjemalloc1']) {
+    package { 'libjemalloc1':
+      ensure => present,
+    }
+  }
+
   include ::pip::python3
 
   exec { 'install-ara-safely':
