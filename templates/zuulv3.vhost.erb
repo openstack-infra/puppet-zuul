@@ -45,7 +45,6 @@
   RewriteRule ^/api/console-stream <%= scope.lookupvar('::zuul::web::websocket_url') %>/api/tenant/<%= scope.lookupvar('::zuul::web::vhosts_flags_int')[@vhost_name]['tenant_name'] %>/console-stream [P,L]
   RewriteRule ^/api/(.*)$ <%= scope.lookupvar('::zuul::web::web_url') %>/api/tenant/<%= scope.lookupvar('::zuul::web::vhosts_flags_int')[@vhost_name]['tenant_name'] %>/$1 [P,L]
   <% else -%>
-  RewriteRule ^/t/(.*) /$1 [L]
   RewriteRule ^/api/tenant/(.*)/console-stream <%= scope.lookupvar('::zuul::web::websocket_url') %>/api/tenant/$1/console-stream [P,L]
   RewriteRule ^/api/(.*)$ <%= scope.lookupvar('::zuul::web::web_url') %>/api/$1 [P,L]
   <% end -%>
