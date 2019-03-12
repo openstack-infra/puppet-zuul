@@ -15,13 +15,20 @@
 define zuul::status_backups (
   $tenant_name,
   $ssl,
+  $status_uri = undef,
 ) {
-  if $tenant_name and $tenant_name != '' {
+  if $status_uri == undef {
     if $ssl {
       $status = "https://${name}/api/status"
     } else {
       $status = "http://${name}/api/status"
     }
+  }
+  else {
+    $status = $status_uri
+  }
+
+  if $tenant_name and $tenant_name != '' {
     # Minutes, hours, days, etc are not specified here because we are
     # interested in running this *every minute*.
     # This is a mean of backing up status.json periodically in order to provide
