@@ -16,7 +16,7 @@ define zuul::status_backups (
   $tenant_name,
   $ssl,
 ) {
-  if tenant_name and tenant_name != '' {
+  if $tenant_name and $tenant_name != '' {
     if $ssl {
       $status = "https://${name}/api/status"
     } else {
