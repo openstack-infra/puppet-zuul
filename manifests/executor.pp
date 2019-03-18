@@ -40,6 +40,13 @@ class zuul::executor (
     }
   }
 
+  exec { 'zuul-manage-ansible':
+    command     => 'zuul-manage-ansible'
+    path        => '/usr/local/bin:/usr/bin:/bin/',
+    subscribe   => Exec['install_zuul'],
+    refreshonly => true,
+  }
+
   include ::pip::python3
 
   exec { 'install-ara-safely':
