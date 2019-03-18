@@ -56,6 +56,7 @@ git_user_name=<%= @git_name %>
 <% end -%>
 
 [executor]
+manage_ansible=false
 log_config=/etc/zuul/executor-logging.conf
 job_dir=/var/lib/zuul/builds
 <% if @site_variables_yaml_file != nil -%>
