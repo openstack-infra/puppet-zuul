@@ -42,6 +42,7 @@ class zuul::executor (
 
   exec { 'zuul_manage_ansible':
     command     => 'zuul-manage-ansible',
+    environment => ['ANSIBLE_EXTRA_PACKAGES=gear'],
     path        => '/usr/local/bin:/usr/bin:/bin/',
     subscribe   => Exec['install_zuul'],
     refreshonly => true,
