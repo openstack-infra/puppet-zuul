@@ -1,5 +1,3 @@
-# OpenStack Zuul Module
+# This repo has moved to OpenDev
 
-## Overview
-
-TODO: Quick overview
+It can now be found at [https://opendev.org/opendev/puppet-zuul](https://opendev.org/opendev/puppet-zuul)
